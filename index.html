@@ -3,9 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Landing Page</title>
+  <title>StretchFlow – Home</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a href="./no-framework/stretch-app/index.html">Launch Stretching App</a>
+
+  <!-- ===== TOP NAV BAR ===== -->
+  <nav class="top-nav">
+    <a href="index.html" class="brand">StretchFlow</a>
+
+    <!-- "Navigate" dropdown – CSS-only checkbox hack -->
+    <div class="dropdown">
+      <input type="checkbox" id="menu-toggle" class="menu-toggle">
+      <label for="menu-toggle" class="menu-label">Navigate ▾</label>
+      <div class="dropdown-content">
+        <a href="index.html">Home</a>
+        <a href="catalog.html">Stretch Catalog</a>
+        <a href="general.html">General Stretches</a>
+        <a href="stretches.html">All Stretches</a>
+        <a href="profile.html">Profile</a>
+      </div>
+    </div>
+
+    <!-- direct links also visible on the bar -->
+    <a href="index.html" class="nav-link active">Home</a>
+    <a href="catalog.html" class="nav-link">Catalog</a>
+    <a href="general.html" class="nav-link">Routines</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+  </nav>
+
+  <!-- ========================================================== -->
+  <!--  HOME PAGE                                                  -->
+  <!-- ========================================================== -->
+  <div class="container">
+    <div class="card green-accent">
+      <h1>Welcome to StretchFlow</h1>
+      <p>Your personal stretching companion. Use the navigation above to explore stretches by muscle group, follow preset routines, or view your profile.</p>
+    </div>
+  </div>
+
 </body>
 </html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StretchFlow – Stretch Catalog</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== TOP NAV BAR ===== -->
+  <nav class="top-nav">
+    <a href="index.html" class="brand">StretchFlow</a>
+    <div class="dropdown">
+      <input type="checkbox" id="menu-toggle" class="menu-toggle">
+      <label for="menu-toggle" class="menu-label">Navigate ▾</label>
+      <div class="dropdown-content">
+        <a href="index.html">Home</a>
+        <a href="catalog.html">Stretch Catalog</a>
+        <a href="general.html">General Stretches</a>
+        <a href="stretches.html">All Stretches</a>
+        <a href="profile.html">Profile</a>
+      </div>
+    </div>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="catalog.html" class="nav-link active">Catalog</a>
+    <a href="general.html" class="nav-link">Routines</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+  </nav>
+
+  <!-- ========================================================== -->
+  <!--  STRETCH CATALOG                                            -->
+  <!-- ========================================================== -->
+  <div class="container">
+    <div class="card green-accent">
+      <h1>Stretch Catalog</h1>
+      <p>Select a muscle group below to see a recommended stretch.</p>
+
+      <!-- Muscle-group sub-tabs -->
+      <div class="sub-tabs">
+        <button onclick="showMuscle('neck')">Neck</button>
+        <button onclick="showMuscle('traps')">Traps</button>
+        <button onclick="showMuscle('shoulders')">Shoulders</button>
+        <button onclick="showMuscle('upperback')">Upper Back</button>
+        <button onclick="showMuscle('lowerback')">Lower Back</button>
+        <button onclick="showMuscle('chest')">Chest</button>
+        <button onclick="showMuscle('biceps')">Biceps</button>
+        <button onclick="showMuscle('triceps')">Triceps</button>
+        <button onclick="showMuscle('forearms')">Forearms</button>
+        <button onclick="showMuscle('glutes')">Glutes</button>
+        <button onclick="showMuscle('hips')">Hips</button>
+        <button onclick="showMuscle('hamstrings')">Hamstrings</button>
+        <button onclick="showMuscle('quads')">Quads</button>
+        <button onclick="showMuscle('calves')">Calves</button>
+        <button onclick="showMuscle('feet')">Feet</button>
+      </div>
+    </div>
+
+    <!-- Each muscle panel is its own yellow-accent card -->
+
+    <div id="muscle-neck" class="card yellow-accent muscle-panel" hidden>
+      <h2>Neck</h2>
+      <h3>Lateral Neck Tilt</h3>
+      <p><strong>How to:</strong> Stand or sit tall. Slowly tilt your head toward your right shoulder until you feel a gentle stretch on the left side of your neck. Hold for 20–30 seconds, then switch sides.</p>
+      <p><strong>Target:</strong> Lateral neck muscles (scalenes, upper trapezius)</p>
+    </div>
+
+    <div id="muscle-traps" class="card yellow-accent muscle-panel" hidden>
+      <h2>Traps</h2>
+      <h3>Upper Trap Stretch</h3>
+      <p><strong>How to:</strong> Sit up straight. Place your right hand on top of your head and gently pull your head toward your right shoulder while keeping your left shoulder down. Hold for 20–30 seconds, then switch sides.</p>
+      <p><strong>Target:</strong> Upper trapezius</p>
+    </div>
+
+    <div id="muscle-shoulders" class="card yellow-accent muscle-panel" hidden>
+      <h2>Shoulders</h2>
+      <h3>Cross-Body Shoulder Stretch</h3>
+      <p><strong>How to:</strong> Bring your right arm across your chest. Use your left hand to gently press your right arm closer to your body. Hold for 20–30 seconds, then switch arms.</p>
+      <p><strong>Target:</strong> Posterior deltoid, rotator cuff</p>
+    </div>
+
+    <div id="muscle-upperback" class="card yellow-accent muscle-panel" hidden>
+      <h2>Upper Back</h2>
+      <h3>Cat-Cow Stretch</h3>
+      <p><strong>How to:</strong> Start on your hands and knees. Inhale and arch your back, dropping your belly toward the floor (cow). Exhale and round your spine toward the ceiling, tucking your chin (cat). Repeat for 30–60 seconds.</p>
+      <p><strong>Target:</strong> Thoracic spine, rhomboids, erector spinae</p>
+    </div>
+
+    <div id="muscle-lowerback" class="card yellow-accent muscle-panel" hidden>
+      <h2>Lower Back</h2>
+      <h3>Knee-to-Chest Stretch</h3>
+      <p><strong>How to:</strong> Lie on your back. Pull one knee toward your chest, holding it with both hands. Keep your other leg flat on the floor. Hold for 20–30 seconds, then switch legs.</p>
+      <p><strong>Target:</strong> Lumbar erector spinae, lower back</p>
+    </div>
+
+    <div id="muscle-chest" class="card yellow-accent muscle-panel" hidden>
+      <h2>Chest</h2>
+      <h3>Doorway Chest Stretch</h3>
+      <p><strong>How to:</strong> Stand in an open doorway. Place your forearms on each side of the door frame at shoulder height. Step one foot forward and lean gently until you feel a stretch across your chest. Hold for 20–30 seconds.</p>
+      <p><strong>Target:</strong> Pectoralis major and minor</p>
+    </div>
+
+    <div id="muscle-biceps" class="card yellow-accent muscle-panel" hidden>
+      <h2>Biceps</h2>
+      <h3>Wall Bicep Stretch</h3>
+      <p><strong>How to:</strong> Stand next to a wall. Place your right palm flat on the wall at shoulder height with your arm straight. Slowly rotate your body away from the wall until you feel a stretch in your bicep. Hold for 20–30 seconds, then switch arms.</p>
+      <p><strong>Target:</strong> Biceps brachii</p>
+    </div>
+
+    <div id="muscle-triceps" class="card yellow-accent muscle-panel" hidden>
+      <h2>Triceps</h2>
+      <h3>Overhead Tricep Stretch</h3>
+      <p><strong>How to:</strong> Raise your right arm overhead. Bend your elbow so your right hand reaches toward the middle of your upper back. Use your left hand to gently push your right elbow back. Hold for 20–30 seconds, then switch arms.</p>
+      <p><strong>Target:</strong> Triceps brachii</p>
+    </div>
+
+    <div id="muscle-forearms" class="card yellow-accent muscle-panel" hidden>
+      <h2>Forearms</h2>
+      <h3>Wrist Flexor Stretch</h3>
+      <p><strong>How to:</strong> Extend your right arm in front of you with your palm facing up. Use your left hand to gently pull your fingers downward toward the floor. Hold for 20–30 seconds, then switch hands.</p>
+      <p><strong>Target:</strong> Wrist flexors, forearm muscles</p>
+    </div>
+
+    <div id="muscle-glutes" class="card yellow-accent muscle-panel" hidden>
+      <h2>Glutes</h2>
+      <h3>Seated Figure-Four Stretch</h3>
+      <p><strong>How to:</strong> Sit on a chair. Cross your right ankle over your left knee. Sit tall and gently lean forward until you feel a stretch in your right glute. Hold for 20–30 seconds, then switch sides.</p>
+      <p><strong>Target:</strong> Gluteus maximus, piriformis</p>
+    </div>
+
+    <div id="muscle-hips" class="card yellow-accent muscle-panel" hidden>
+      <h2>Hips</h2>
+      <h3>Kneeling Hip Flexor Stretch</h3>
+      <p><strong>How to:</strong> Kneel on your right knee with your left foot flat on the floor in front of you. Push your hips forward gently while keeping your torso upright. Hold for 20–30 seconds, then switch sides.</p>
+      <p><strong>Target:</strong> Hip flexors (iliopsoas)</p>
+    </div>
+
+    <div id="muscle-hamstrings" class="card yellow-accent muscle-panel" hidden>
+      <h2>Hamstrings</h2>
+      <h3>Standing Toe Touch</h3>
+      <p><strong>How to:</strong> Stand with your feet hip-width apart. Slowly bend forward at the hips, reaching your hands toward your toes. Keep a slight bend in your knees. Hold for 20–30 seconds.</p>
+      <p><strong>Target:</strong> Hamstrings, lower back</p>
+    </div>
+
+    <div id="muscle-quads" class="card yellow-accent muscle-panel" hidden>
+      <h2>Quads</h2>
+      <h3>Standing Quad Stretch</h3>
+      <p><strong>How to:</strong> Stand on your left leg. Grab your right ankle behind you and pull your heel toward your glute. Keep your knees together and your torso upright. Hold for 20–30 seconds, then switch legs.</p>
+      <p><strong>Target:</strong> Quadriceps</p>
+    </div>
+
+    <div id="muscle-calves" class="card yellow-accent muscle-panel" hidden>
+      <h2>Calves</h2>
+      <h3>Wall Calf Stretch</h3>
+      <p><strong>How to:</strong> Stand facing a wall. Place your hands on the wall. Step your right foot back, keeping it straight with your heel on the ground. Bend your left knee and lean into the wall. Hold for 20–30 seconds, then switch legs.</p>
+      <p><strong>Target:</strong> Gastrocnemius, soleus</p>
+    </div>
+
+    <div id="muscle-feet" class="card yellow-accent muscle-panel" hidden>
+      <h2>Feet</h2>
+      <h3>Plantar Fascia Stretch</h3>
+      <p><strong>How to:</strong> Sit down and cross one foot over the opposite knee. Grab your toes and gently pull them back toward your shin until you feel a stretch along the bottom of your foot. Hold for 20–30 seconds, then switch feet.</p>
+      <p><strong>Target:</strong> Plantar fascia, intrinsic foot muscles</p>
+    </div>
+
+  </div><!-- /container -->
+
+  <script>
+    function showMuscle(id) {
+      var panels = document.querySelectorAll('.muscle-panel');
+      for (var i = 0; i < panels.length; i++) {
+        panels[i].hidden = true;
+      }
+      document.getElementById('muscle-' + id).hidden = false;
+    }
+  </script>
+
+</body>
+</html>

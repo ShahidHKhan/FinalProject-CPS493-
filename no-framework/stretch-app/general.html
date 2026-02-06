@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StretchFlow – General Stretches</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== TOP NAV BAR ===== -->
+  <nav class="top-nav">
+    <a href="index.html" class="brand">StretchFlow</a>
+    <div class="dropdown">
+      <input type="checkbox" id="menu-toggle" class="menu-toggle">
+      <label for="menu-toggle" class="menu-label">Navigate ▾</label>
+      <div class="dropdown-content">
+        <a href="index.html">Home</a>
+        <a href="catalog.html">Stretch Catalog</a>
+        <a href="general.html">General Stretches</a>
+        <a href="stretches.html">All Stretches</a>
+        <a href="profile.html">Profile</a>
+      </div>
+    </div>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="catalog.html" class="nav-link">Catalog</a>
+    <a href="general.html" class="nav-link active">Routines</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+  </nav>
+
+  <!-- ========================================================== -->
+  <!--  GENERAL STRETCHES                                          -->
+  <!-- ========================================================== -->
+  <div class="container">
+    <div class="card green-accent">
+      <h1>General Stretches</h1>
+      <p>Pick a preset stretching routine to follow.</p>
+
+      <div class="sub-tabs">
+        <button onclick="showRoutine('morning')">Morning Stretch</button>
+        <button onclick="showRoutine('desk')">Desk Break Stretch</button>
+        <button onclick="showRoutine('gym')">Pre/Post Gym Stretch</button>
+      </div>
+    </div>
+
+    <!-- Morning Stretch -->
+    <div id="routine-morning" class="card yellow-accent routine-panel" hidden>
+      <h2>Morning Stretch</h2>
+      <p>A gentle wake-up routine to start your day loose and energized.</p>
+      <ol>
+        <li>
+          <h3>1. Lateral Neck Tilt</h3>
+          <p>Stand or sit tall. Slowly tilt your head toward your right shoulder until you feel a gentle stretch on the left side of your neck. Hold for 20–30 seconds, then switch sides.</p>
+        </li>
+        <li>
+          <h3>2. Cat-Cow Stretch</h3>
+          <p>Start on your hands and knees. Inhale and arch your back (cow). Exhale and round your spine toward the ceiling (cat). Repeat for 30–60 seconds.</p>
+        </li>
+        <li>
+          <h3>3. Standing Toe Touch</h3>
+          <p>Stand with your feet hip-width apart. Slowly bend forward at the hips, reaching your hands toward your toes. Hold for 20–30 seconds.</p>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Desk Break Stretch -->
+    <div id="routine-desk" class="card yellow-accent routine-panel" hidden>
+      <h2>Desk Break Stretch</h2>
+      <p>Quick relief for stiffness from sitting at a desk all day.</p>
+      <ol>
+        <li>
+          <h3>1. Upper Trap Stretch</h3>
+          <p>Sit up straight. Place your right hand on top of your head and gently pull your head toward your right shoulder while keeping your left shoulder down. Hold for 20–30 seconds, then switch sides.</p>
+        </li>
+        <li>
+          <h3>2. Doorway Chest Stretch</h3>
+          <p>Stand in an open doorway. Place your forearms on each side of the door frame at shoulder height. Step one foot forward and lean gently until you feel a stretch across your chest. Hold for 20–30 seconds.</p>
+        </li>
+        <li>
+          <h3>3. Wrist Flexor Stretch</h3>
+          <p>Extend your right arm in front of you with your palm facing up. Use your left hand to gently pull your fingers downward toward the floor. Hold for 20–30 seconds, then switch hands.</p>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Pre/Post Gym Stretch -->
+    <div id="routine-gym" class="card yellow-accent routine-panel" hidden>
+      <h2>Pre/Post Gym Stretch</h2>
+      <p>Warm up before your workout or cool down after to prevent injury.</p>
+      <ol>
+        <li>
+          <h3>1. Kneeling Hip Flexor Stretch</h3>
+          <p>Kneel on your right knee with your left foot flat on the floor in front of you. Push your hips forward gently while keeping your torso upright. Hold for 20–30 seconds, then switch sides.</p>
+        </li>
+        <li>
+          <h3>2. Standing Quad Stretch</h3>
+          <p>Stand on your left leg. Grab your right ankle behind you and pull your heel toward your glute. Keep your knees together. Hold for 20–30 seconds, then switch legs.</p>
+        </li>
+        <li>
+          <h3>3. Cross-Body Shoulder Stretch</h3>
+          <p>Bring your right arm across your chest. Use your left hand to gently press your right arm closer to your body. Hold for 20–30 seconds, then switch arms.</p>
+        </li>
+      </ol>
+    </div>
+
+  </div><!-- /container -->
+
+  <script>
+    function showRoutine(id) {
+      var panels = document.querySelectorAll('.routine-panel');
+      for (var i = 0; i < panels.length; i++) {
+        panels[i].hidden = true;
+      }
+      document.getElementById('routine-' + id).hidden = false;
+    }
+  </script>
+
+</body>
+</html>

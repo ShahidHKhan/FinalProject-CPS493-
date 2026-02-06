@@ -1,0 +1,257 @@
+/* =============================================================
+   styles.css  –  StretchFlow global styles
+   ============================================================= */
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f1ff;          /* soft lavender */
+  color: #2f2a3b;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+hr {
+  display: none;                       /* hide the raw <hr> tags; cards handle spacing */
+}
+
+/* ---------- Top Nav Bar ---------- */
+.top-nav {
+  background-color: #28324b;          /* deep slate */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.top-nav .brand {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.15rem;
+  padding: 12px 14px;
+  margin-right: auto;                 /* push menu items to the right */
+  text-decoration: none;
+}
+
+/* --- individual nav items (no-dropdown) --- */
+.top-nav .nav-link {
+  color: #dfe6ff;
+  text-decoration: none;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.top-nav .nav-link:hover,
+.top-nav .nav-link.active {
+  background-color: #3d4e75;
+  color: #ffffff;
+}
+
+/* --- dropdown wrapper (CSS-only checkbox hack) --- */
+.dropdown {
+  position: relative;
+}
+
+/* hide the real checkbox */
+.dropdown .menu-toggle {
+  display: none;
+}
+
+/* the visible label that looks like a nav link */
+.dropdown .menu-label {
+  color: #dfe6ff;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+  display: inline-block;
+  user-select: none;
+}
+
+.dropdown .menu-label:hover {
+  background-color: #3d4e75;
+  color: #ffffff;
+}
+
+/* dropdown panel – hidden by default */
+.dropdown .dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #28324b;
+  min-width: 200px;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 200;
+}
+
+/* show on :checked (checkbox hack) */
+.dropdown .menu-toggle:checked ~ .dropdown-content {
+  display: block;
+}
+
+/* links inside dropdown */
+.dropdown .dropdown-content a {
+  display: block;
+  color: #dfe6ff;
+  text-decoration: none;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  transition: background 0.15s;
+}
+
+.dropdown .dropdown-content a:hover {
+  background-color: #3d4e75;
+  color: #ffffff;
+}
+
+/* ---------- Page Container ---------- */
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* ---------- Content Cards ---------- */
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card.green-accent {
+  border-left: 8px solid #00bfa6; /* teal accent */
+}
+
+.card.yellow-accent {
+  border-left: 8px solid #ffb74d; /* warm amber accent */
+}
+
+.card.blue-accent {
+  border-left: 8px solid #7c4dff; /* violet accent */
+}
+
+.card h1 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+  color: #28324b;
+}
+
+.card h2 {
+  font-size: 1.3rem;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  color: #3d4e75;
+}
+
+.card h3 {
+  font-size: 1.05rem;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  color: #5a6aa2;
+}
+
+.card p {
+  margin-bottom: 8px;
+}
+
+.card ol, .card ul {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.card li {
+  margin-bottom: 12px;
+}
+
+/* ---------- Sub-Tab Buttons (muscle groups / routines) ---------- */
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.sub-tabs button {
+  background-color: #ede7f6;
+  color: #28324b;
+  border: 2px solid #b39ddb;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sub-tabs button:hover {
+  background-color: #7c4dff;
+  color: #ffffff;
+  border-color: #7c4dff;
+}
+
+/* ---------- Muscle / Routine Panels ---------- */
+.muscle-panel,
+.routine-panel {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Stretch reference page dividers ---------- */
+.stretch-entry {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.stretch-entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .top-nav {
+    flex-wrap: wrap;
+    padding: 8px 10px;
+  }
+
+  .top-nav .brand {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .container {
+    padding: 0 12px;
+    margin: 16px auto;
+  }
+
+  .card {
+    padding: 18px 16px;
+  }
+
+  .sub-tabs button {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+  }
+}

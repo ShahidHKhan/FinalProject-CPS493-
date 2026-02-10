@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Basic Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+    <style>
+      body { background-color: #f8fafc; }
+      .navbar.is-indigo { background-color: #2ad6a2; color: white; }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar is-indigo">
+      <div class="navbar-brand">
+        <a class="navbar-item"><strong>Cool LOGO</strong></a>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item has-text-white">Link 1</a>
+          <a class="navbar-item has-text-white">Link 2</a>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-white is-outlined">Button A</a>
+              <a class="button is-white">Button B</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns">
+          
+          <div class="column is-3">
+            <div class="card is-shadowless">
+              <header class="card-header">
+                <p class="card-header-title">Heading 1</p>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  <p>Blah Blah Blah Random Text Goes here.</p>
+                  <span class="tag is-light">Status</span>
+                </div>
+              </div>
+              <footer class="card-footer">
+                <a class="card-footer-item">Link</a>
+                <a class="card-footer-item">Link</a>
+              </footer>
+            </div>
+          </div>
+
+          <div class="column is-6">
+            <div class="tabs is-toggle is-fullwidth is-small">
+              <ul>
+                <li class="is-active"><a>Tab 1</a></li>
+                <li><a>Tab 2</a></li>
+                <li><a>Tab 3</a></li>
+              </ul>
+            </div>
+
+            <nav class="panel has-background-white">
+              <p class="panel-heading">List Heading</p>
+              <div class="panel-block">
+                <p class="control has-icons-left">
+                  <input class="input is-small" type="text" placeholder="Search...">
+                  <span class="icon is-small is-left"><i class="fas fa-search"></i></span>
+                </p>
+              </div>
+              <label class="panel-block"><input type="checkbox" checked> Item 1</label>
+              <label class="panel-block"><input type="checkbox"> Item 2</label>
+              <label class="panel-block"><input type="checkbox"> Item 3</label>
+            </nav>
+
+            <article class="message is-info">
+              <div class="message-header">
+                <p>Notification</p>
+                <button class="delete"></button>
+              </div>
+              <div class="message-body is-size-7">
+                This is a message body for cool people info.
+                <progress class="progress is-info mt-2" value="50" max="100">50%</progress>
+              </div>
+            </article>
+
+            <div class="box">
+              <div class="field">
+                <label class="label">Field Label 1</label>
+                <div class="control"><input class="input" type="text" placeholder="Input text"></div>
+              </div>
+
+              <div class="field">
+                <label class="label">Field Label 2</label>
+                <div class="control has-icons-left">
+                  <input class="input is-danger" type="text" value="Error state">
+                  <span class="icon is-small is-left"><i class="fas fa-exclamation"></i></span>
+                </div>
+                <p class="help is-danger">Validation message</p>
+              </div>
+
+              <div class="field">
+                <div class="control">
+                  <textarea class="textarea" placeholder="Textarea"></textarea>
+                </div>
+              </div>
+
+              <div class="buttons">
+                <button class="button is-link">Action 1</button>
+                <button class="button is-light">Action 2</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="column is-3">
+            <aside class="menu">
+              <p class="menu-label">Category 1</p>
+              <ul class="menu-list">
+                <li><a>Link A</a></li>
+                <li><a>Link B</a></li>
+              </ul>
+              <p class="menu-label">Category 2</p>
+              <ul class="menu-list">
+                <li>
+                  <a class="is-active">Active Link</a>
+                  <ul>
+                    <li><a>Sub-link 1</a></li>
+                    <li><a>Sub-link 2</a></li>
+                  </ul>
+                </li>
+                <li><a>Link C</a></li>
+              </ul>
+            </aside>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

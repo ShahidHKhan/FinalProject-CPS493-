@@ -69,7 +69,7 @@ const handleLogout = () => {
             <div class="dropdown is-right" :class="{ 'is-active': showLoginMenu }">
               <div class="dropdown-trigger">
                 <button
-                  class="button is-light is-small"
+                  class="button is-light nav-account-button"
                   aria-haspopup="true"
                   aria-controls="login-menu"
                   @click="showLoginMenu = !showLoginMenu"
@@ -94,7 +94,7 @@ const handleLogout = () => {
           </div>
 
           <div class="navbar-item" v-else>
-            <button class="button is-danger is-light is-small" @click="handleLogout">Log out</button>
+            <button class="button is-danger is-light nav-account-button" @click="handleLogout">Log out</button>
           </div>
         </div>
       </div>
@@ -158,8 +158,16 @@ const handleLogout = () => {
 }
 
 .user-label {
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.nav-account-button {
+  font-size: 1.15rem;
+  font-weight: 700;
+  min-height: 3.1rem;
+  padding-inline: 1.1rem;
 }
 
 .site-navbar .navbar-item {

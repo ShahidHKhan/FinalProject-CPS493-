@@ -17,7 +17,7 @@ const router = createRouter({
     {
       path: '/database',
       name: 'database',
-      component: () => import('../views/DatabasePage.vue'),
+      component: () => import('../views/StretchList.vue'),
     },
     {
       path: '/friends',

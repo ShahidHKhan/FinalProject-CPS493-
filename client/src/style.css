@@ -1,4 +1,8 @@
 :root {
+  --brand-teal: #f39c12;
+  --brand-teal-dark: #c56a00;
+  --brand-teal-soft: #fff1de;
+  --brand-danger: #d64550;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -40,4 +44,44 @@ main {
 
 .title.is-4 {
   font-size: clamp(1.2rem, 2vw, 1.45rem);
+}
+
+.box {
+  border: 1px solid #dff3ef;
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(18, 55, 63, 0.08);
+}
+
+.button {
+  border-radius: 8px;
+  font-weight: 700;
+  min-height: 2.5rem;
+  padding-inline: 1rem;
+}
+
+.button.is-primary,
+.button.is-link,
+.button.is-success {
+  background-color: var(--brand-teal);
+  border-color: var(--brand-teal-dark);
+  color: #ffffff;
+}
+
+.button.is-primary:hover,
+.button.is-link:hover,
+.button.is-success:hover {
+  background-color: #e67e22;
+  border-color: var(--brand-teal-dark);
+  color: #ffffff;
+}
+
+.button.is-danger {
+  background-color: var(--brand-danger);
+  border-color: #b93a44;
+  color: #ffffff;
+}
+
+.tag.is-primary {
+  background-color: var(--brand-teal);
+  color: #ffffff;
 }

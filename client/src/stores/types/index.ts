@@ -5,3 +5,11 @@ export interface Stretch {
   status: 'Static' | 'Dynamic'
   targetMuscles: string[]
 }
+
+export type UserRole = 'admin' | 'regular'
+
+export interface User {
+  id: number
+  name: string
+  role: UserRole
+}

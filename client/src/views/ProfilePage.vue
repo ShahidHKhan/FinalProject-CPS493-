@@ -1,9 +1,29 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
+import { useStretchStore } from '../stores/stretches'
+import { useWorkoutStore } from '../stores/workouts'
 
 const authStore = useAuthStore()
+const stretchStore = useStretchStore()
+const workoutStore = useWorkoutStore()
+
 const { currentUser } = storeToRefs(authStore)
+const { stretches } = storeToRefs(stretchStore)
+
+const userWorkouts = computed(() => {
+  if (!currentUser.value) return []
+  return workoutStore.workoutsByUser(currentUser.value.id)
+})
+
+const stretchNameById = (stretchId: number) => {
+  return stretches.value.find((stretch) => stretch.id === stretchId)?.name ?? 'Unknown Stretch'
+}
+
+const formatPublishedDate = (isoDate: string) => {
+  return new Date(isoDate).toLocaleString()
+}
 </script>
 
 <template>
@@ -15,7 +35,27 @@ const { currentUser } = storeToRefs(authStore)
 
       <template v-else>
         <h1 class="title">Profile</h1>
-        <p>Profile page placeholder for {{ currentUser.name }}.</p>
+        <p class="mb-5">Workout activity for {{ currentUser.name }}.</p>
+
+        <h2 class="title is-4">Published Workouts</h2>
+
+        <div v-if="userWorkouts.length === 0" class="notification is-info is-light">
+          No workouts published yet. Go to Workouts to create and publish one.
+        </div>
+
+        <div v-else class="content">
+          <div v-for="workout in userWorkouts" :key="workout.id" class="box mb-4">
+            <h3 class="title is-5">{{ workout.title }}</h3>
+            <p>
+              <strong>Time Workout:</strong> {{ workout.workoutTimeMinutes }} minutes |
+              <strong>Published:</strong> {{ formatPublishedDate(workout.publishedAt) }}
+            </p>
+            <p>
+              <strong>Stretches:</strong>
+              {{ workout.stretchIds.map((stretchId) => stretchNameById(stretchId)).join(', ') }}
+            </p>
+          </div>
+        </div>
       </template>
     </div>
   </section>

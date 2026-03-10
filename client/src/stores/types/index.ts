@@ -6,6 +6,15 @@ export interface Stretch {
   targetMuscles: string[]
 }
 
+export interface Workout {
+  id: number
+  userId: number
+  title: string
+  workoutTimeMinutes: number
+  stretchIds: number[]
+  publishedAt: string
+}
+
 export type UserRole = 'admin' | 'regular'
 
 export interface User {

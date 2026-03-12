@@ -18,13 +18,6 @@ const router = createRouter({
       },
     },
     {
-      path: '/friends',
-      name: 'friends',
-      component: function () {
-        return import('../views/FriendsPage.vue')
-      },
-    },
-    {
       path: '/workouts',
       name: 'workouts',
       component: function () {

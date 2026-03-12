@@ -53,7 +53,6 @@ function handleLogout() {
         <div class="navbar-start">
           <RouterLink to="/" class="navbar-item nav-link" @click="closeMenus">Home</RouterLink>
           <RouterLink to="/profile" class="navbar-item nav-link" @click="closeMenus">Profile</RouterLink>
-          <RouterLink to="/friends" class="navbar-item nav-link" @click="closeMenus">Friends</RouterLink>
           <RouterLink to="/workouts" class="navbar-item nav-link" @click="closeMenus">Workouts</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin" class="navbar-item nav-link" @click="closeMenus">Admin</RouterLink>
           <span v-else class="navbar-item nav-link is-disabled" aria-disabled="true">Admin</span>

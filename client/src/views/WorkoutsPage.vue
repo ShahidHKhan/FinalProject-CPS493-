@@ -55,33 +55,35 @@ const presetTimeByKey = ref<Record<PresetWorkout['key'], number | null>>({
   arms: null,
 })
 
-const toggleStretch = (stretchId: number) => {
+function toggleStretch(stretchId: number) {
   if (selectedStretchIds.value.includes(stretchId)) {
-    selectedStretchIds.value = selectedStretchIds.value.filter((id) => id !== stretchId)
+    selectedStretchIds.value = selectedStretchIds.value.filter(function (id) {
+      return id !== stretchId
+    })
     return
   }
 
   selectedStretchIds.value = [...selectedStretchIds.value, stretchId]
 }
 
-const resetForm = () => {
+function resetForm() {
   title.value = ''
   workoutTimeMinutes.value = null
   selectedStretchIds.value = []
   errorMessage.value = ''
 }
 
-const createWorkout = () => {
+function createWorkout() {
   isCreatingWorkout.value = true
   errorMessage.value = ''
 }
 
-const cancelCreate = () => {
+function cancelCreate() {
   isCreatingWorkout.value = false
   resetForm()
 }
 
-const publishWorkout = () => {
+function publishWorkout() {
   if (!currentUser.value) return
 
   const trimmedTitle = title.value.trim()
@@ -112,7 +114,7 @@ const publishWorkout = () => {
   resetForm()
 }
 
-const publishPresetWorkout = (preset: PresetWorkout) => {
+function publishPresetWorkout(preset: PresetWorkout) {
   if (!currentUser.value) return
 
   const timeMinutes = presetTimeByKey.value[preset.key]
@@ -133,12 +135,22 @@ const publishPresetWorkout = (preset: PresetWorkout) => {
   presetErrorMessage.value = ''
 }
 
-const stretchNameById = (stretchId: number) => {
-  return stretches.value.find((stretch) => stretch.id === stretchId)?.name ?? 'Unknown Stretch'
+function stretchNameById(stretchId: number) {
+  const matchingStretch = stretches.value.find(function (stretch) {
+    return stretch.id === stretchId
+  })
+
+  if (matchingStretch === undefined || matchingStretch === null) {
+    return 'Unknown Stretch'
+  }
+
+  return matchingStretch.name
 }
 
-const presetStretchNames = (stretchIds: number[]) => {
-  return stretchIds.map((stretchId) => stretchNameById(stretchId)).join(', ')
+function presetStretchNames(stretchIds: number[]) {
+  return stretchIds.map(function (stretchId) {
+    return stretchNameById(stretchId)
+  }).join(', ')
 }
 </script>
 

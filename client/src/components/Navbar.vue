@@ -11,21 +11,21 @@ const { loginAs, logout } = authStore
 const showLoginMenu = ref(false)
 const showMobileMenu = ref(false)
 
-const closeMenus = () => {
+function closeMenus() {
   showMobileMenu.value = false
   showLoginMenu.value = false
 }
 
-const toggleMobileMenu = () => {
+function toggleMobileMenu() {
   showMobileMenu.value = !showMobileMenu.value
 }
 
-const handleLogin = (user: User) => {
+function handleLogin(user: User) {
   loginAs(user)
   closeMenus()
 }
 
-const handleLogout = () => {
+function handleLogout() {
   logout()
   closeMenus()
 }

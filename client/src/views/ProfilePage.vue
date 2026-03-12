@@ -12,17 +12,31 @@ const workoutStore = useWorkoutStore()
 const { currentUser } = storeToRefs(authStore)
 const { stretches } = storeToRefs(stretchStore)
 
-const userWorkouts = computed(() => {
+const userWorkouts = computed(function () {
   if (!currentUser.value) return []
   return workoutStore.workoutsByUser(currentUser.value.id)
 })
 
-const stretchNameById = (stretchId: number) => {
-  return stretches.value.find((stretch) => stretch.id === stretchId)?.name ?? 'Unknown Stretch'
+function stretchNameById(stretchId: number) {
+  const matchingStretch = stretches.value.find(function (stretch) {
+    return stretch.id === stretchId
+  })
+
+  if (matchingStretch === undefined || matchingStretch === null) {
+    return 'Unknown Stretch'
+  }
+
+  return matchingStretch.name
 }
 
-const formatPublishedDate = (isoDate: string) => {
+function formatPublishedDate(isoDate: string) {
   return new Date(isoDate).toLocaleString()
+}
+
+function stretchNamesByIds(stretchIds: number[]) {
+  return stretchIds.map(function (stretchId) {
+    return stretchNameById(stretchId)
+  }).join(', ')
 }
 </script>
 
@@ -52,7 +66,7 @@ const formatPublishedDate = (isoDate: string) => {
             </p>
             <p>
               <strong>Stretches:</strong>
-              {{ workout.stretchIds.map((stretchId) => stretchNameById(stretchId)).join(', ') }}
+              {{ stretchNamesByIds(workout.stretchIds) }}
             </p>
           </div>
         </div>

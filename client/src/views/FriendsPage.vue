@@ -12,27 +12,53 @@ const workoutStore = useWorkoutStore()
 const { currentUser, availableAccounts } = storeToRefs(authStore)
 const { stretches } = storeToRefs(stretchStore)
 
-const friendsList = computed(() => {
+const friendsList = computed(function () {
   if (!currentUser.value) return []
-  return availableAccounts.value.filter((account) => account.id !== currentUser.value!.id)
+  return availableAccounts.value.filter(function (account) {
+    return account.id !== currentUser.value!.id
+  })
 })
 
-const activityWorkouts = computed(() => {
+const activityWorkouts = computed(function () {
   return [...workoutStore.workouts].sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+    function (a, b) {
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    },
   )
 })
 
-const userNameById = (userId: number) => {
-  return availableAccounts.value.find((account) => account.id === userId)?.name ?? 'Unknown User'
+function userNameById(userId: number) {
+  const matchingAccount = availableAccounts.value.find(function (account) {
+    return account.id === userId
+  })
+
+  if (matchingAccount === undefined || matchingAccount === null) {
+    return 'Unknown User'
+  }
+
+  return matchingAccount.name
 }
 
-const stretchNameById = (stretchId: number) => {
-  return stretches.value.find((stretch) => stretch.id === stretchId)?.name ?? 'Unknown Stretch'
+function stretchNameById(stretchId: number) {
+  const matchingStretch = stretches.value.find(function (stretch) {
+    return stretch.id === stretchId
+  })
+
+  if (matchingStretch === undefined || matchingStretch === null) {
+    return 'Unknown Stretch'
+  }
+
+  return matchingStretch.name
 }
 
-const formatPublishedDate = (isoDate: string) => {
+function formatPublishedDate(isoDate: string) {
   return new Date(isoDate).toLocaleString()
+}
+
+function stretchNamesByIds(stretchIds: number[]) {
+  return stretchIds.map(function (stretchId) {
+    return stretchNameById(stretchId)
+  }).join(', ')
 }
 </script>
 
@@ -66,7 +92,7 @@ const formatPublishedDate = (isoDate: string) => {
                 </p>
                 <p>
                   <strong>Stretches:</strong>
-                  {{ workout.stretchIds.map((stretchId) => stretchNameById(stretchId)).join(', ') }}
+                  {{ stretchNamesByIds(workout.stretchIds) }}
                 </p>
               </div>
             </div>

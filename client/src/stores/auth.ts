@@ -8,18 +8,22 @@ const availableAccounts: User[] = [
   { id: 3, name: 'Regular Charlie', role: 'regular' },
 ]
 
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore('auth', function () {
   const accountOptions = ref<User[]>(availableAccounts)
   const currentUser = ref<User | null>(null)
 
-  const isLoggedIn = computed(() => currentUser.value !== null)
-  const isAdmin = computed(() => currentUser.value?.role === 'admin')
+  const isLoggedIn = computed(function () {
+    return currentUser.value !== null
+  })
+  const isAdmin = computed(function () {
+    return currentUser.value?.role === 'admin'
+  })
 
-  const loginAs = (user: User) => {
+  function loginAs(user: User) {
     currentUser.value = user
   }
 
-  const logout = () => {
+  function logout() {
     currentUser.value = null
   }
 

@@ -13,28 +13,38 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'profile',
-      component: () => import('../views/ProfilePage.vue'),
+      component: function () {
+        return import('../views/ProfilePage.vue')
+      },
     },
     {
       path: '/database',
       name: 'database',
-      component: () => import('../views/StretchList.vue'),
+      component: function () {
+        return import('../views/StretchList.vue')
+      },
     },
     {
       path: '/friends',
       name: 'friends',
-      component: () => import('../views/FriendsPage.vue'),
+      component: function () {
+        return import('../views/FriendsPage.vue')
+      },
     },
     {
       path: '/workouts',
       name: 'workouts',
-      component: () => import('../views/WorkoutsPage.vue'),
+      component: function () {
+        return import('../views/WorkoutsPage.vue')
+      },
     },
     {
       path: '/admin',
       name: 'admin',
-      component: () => import('../views/AdminPage.vue'),
-      beforeEnter: () => {
+      component: function () {
+        return import('../views/AdminPage.vue')
+      },
+      beforeEnter: function () {
         const authStore = useAuthStore()
 
         if (authStore.isAdmin) {

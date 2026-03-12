@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Stretch } from './types'
 
-export const useStretchStore = defineStore('stretch', () => {
+export const useStretchStore = defineStore('stretch', function () {
   const stretches = ref<Stretch[]>([
     {
       id: 1,

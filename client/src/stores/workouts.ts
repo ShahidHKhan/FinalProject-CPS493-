@@ -2,34 +2,39 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Workout } from './types'
 
-export const useWorkoutStore = defineStore('workout', () => {
+export const useWorkoutStore = defineStore('workout', function () {
   const workouts = ref<Workout[]>([])
 
-  const nextWorkoutId = computed(() => {
+  const nextWorkoutId = computed(function () {
     if (workouts.value.length === 0) return 1
-    return Math.max(...workouts.value.map((workout) => workout.id)) + 1
+    return Math.max(...workouts.value.map(function (workout) {
+      return workout.id
+    })) + 1
   })
 
-  const publishWorkout = (payload: {
+  function publishWorkout(workoutstorage: {
     userId: number
     title: string
     workoutTimeMinutes: number
     stretchIds: number[]
-  }) => {
+  }) {
     const workout: Workout = {
       id: nextWorkoutId.value,
-      userId: payload.userId,
-      title: payload.title,
-      workoutTimeMinutes: payload.workoutTimeMinutes,
-      stretchIds: payload.stretchIds,
+      userId: workoutstorage.userId,
+      title: workoutstorage.title,
+      workoutTimeMinutes: workoutstorage.workoutTimeMinutes,
+      stretchIds: workoutstorage.stretchIds,
       publishedAt: new Date().toISOString(),
     }
 
     workouts.value.unshift(workout)
   }
 
-  const workoutsByUser = (userId: number) =>
-    workouts.value.filter((workout) => workout.userId === userId)
+  function workoutsByUser(userId: number) {
+    return workouts.value.filter(function (workout) {
+      return workout.userId === userId
+    })
+  }
 
   return {
     workouts,

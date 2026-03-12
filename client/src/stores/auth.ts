@@ -1,15 +1,10 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import userData from '../data/users.json'
 import type { User } from './types'
 
-const availableAccounts: User[] = [
-  { id: 1, name: 'Admin Alice', role: 'admin' },
-  { id: 2, name: 'Regular Bob', role: 'regular' },
-  { id: 3, name: 'Regular Charlie', role: 'regular' },
-]
-
 export const useAuthStore = defineStore('auth', function () {
-  const accountOptions = ref<User[]>(availableAccounts)
+  const accountOptions = ref<User[]>(userData as User[])
   const currentUser = ref<User | null>(null)
 
   const isLoggedIn = computed(function () {

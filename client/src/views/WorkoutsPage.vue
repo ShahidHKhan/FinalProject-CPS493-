@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
 import { useWorkoutStore } from '../stores/workouts'
+import Sidebar from '../components/Sidebar.vue'
 
 const authStore = useAuthStore()
 const stretchStore = useStretchStore()
@@ -13,11 +14,22 @@ const { currentUser } = storeToRefs(authStore)
 const { stretches } = storeToRefs(stretchStore)
 
 const isCreatingWorkout = ref(false)
+const isSidebarActive = ref(false)
+const showStretchCatalog = ref(false)
+const sidebarWidth = 460
 const title = ref('')
 const workoutTimeMinutes = ref<number | null>(null)
 const selectedStretchIds = ref<number[]>([])
 const errorMessage = ref('')
 const presetErrorMessage = ref('')
+
+function toggleSidebar() {
+  isSidebarActive.value = !isSidebarActive.value
+}
+
+function toggleStretchCatalog() {
+  showStretchCatalog.value = !showStretchCatalog.value
+}
 
 type PresetWorkout = {
   key: 'upper' | 'lower' | 'full-body' | 'arms'
@@ -156,6 +168,15 @@ function presetStretchNames(stretchIds: number[]) {
 
 <template>
   <section class="section">
+    <button
+      class="sidebar-toggle"
+      type="button"
+      :aria-expanded="isSidebarActive"
+      :style="{ right: isSidebarActive ? `${sidebarWidth}px` : '0px' }"
+      @click="toggleSidebar"
+    >
+      Presets
+    </button>
     <div class="container">
       <div v-if="!currentUser" class="notification is-warning is-light">
         <strong>Log in first:</strong> Select an account on the Home page to access Workouts.
@@ -163,40 +184,6 @@ function presetStretchNames(stretchIds: number[]) {
 
       <template v-else>
         <h1 class="title">Workouts</h1>
-
-        <h2 class="title is-4">Preset Workouts</h2>
-
-        <div v-if="presetErrorMessage" class="notification is-danger is-light py-3">
-          {{ presetErrorMessage }}
-        </div>
-
-        <div class="preset-grid mb-5">
-          <div v-for="preset in presetWorkouts" :key="preset.key" class="box">
-            <h3 class="title is-5">{{ preset.title }}</h3>
-            <p class="mb-3">
-              <strong>Includes:</strong>
-              {{ presetStretchNames(preset.stretchIds) }}
-            </p>
-
-            <div class="field">
-              <label class="label" :for="`preset-time-${preset.key}`">Time (minutes)</label>
-              <div class="control">
-                <input
-                  :id="`preset-time-${preset.key}`"
-                  v-model.number="presetTimeByKey[preset.key]"
-                  class="input"
-                  type="number"
-                  min="1"
-                  placeholder="20"
-                />
-              </div>
-            </div>
-
-            <button class="button is-link" @click="publishPresetWorkout(preset)">Publish</button>
-          </div>
-        </div>
-
-        <hr class="my-5" />
 
         <h2 class="title is-4">Custom Workout</h2>
 
@@ -265,12 +252,88 @@ function presetStretchNames(stretchIds: number[]) {
           </div>
         </div>
 
+        <div class="box mb-5">
+          <h2 class="title is-5 mb-3">Stretches Catalog</h2>
+          <button class="button is-info is-light" type="button" @click="toggleStretchCatalog">
+            {{ showStretchCatalog ? 'Hide Stretches' : 'Show Stretches' }}
+          </button>
+
+          <div v-if="showStretchCatalog" class="catalog-dropdown mt-3">
+            <div v-for="stretch in stretches" :key="`catalog-${stretch.id}`" class="catalog-item">
+              <strong class="catalog-name">{{ stretch.name }}</strong>
+              <p class="catalog-meta has-text-grey">
+                Muscle Group: {{ stretch.targetMuscles.join(', ') }}
+              </p>
+              <p class="catalog-meta has-text-grey">
+                Static-Status: {{ stretch.status }}
+              </p>
+            </div>
+          </div>
+        </div>
+
       </template>
     </div>
+
+    <Sidebar :is-active="isSidebarActive" :width="sidebarWidth">
+      <div class="sidebar-content">
+        <h3 class="title is-5">Preset Workouts</h3>
+
+        <div v-if="presetErrorMessage" class="notification is-danger is-light py-3">
+          {{ presetErrorMessage }}
+        </div>
+
+        <div class="preset-grid mb-5">
+          <div v-for="preset in presetWorkouts" :key="preset.key" class="box preset-box">
+            <h4 class="title is-6">{{ preset.title }}</h4>
+            <p class="mb-3">
+              <strong>Includes:</strong>
+              {{ presetStretchNames(preset.stretchIds) }}
+            </p>
+
+            <div class="field">
+              <label class="label" :for="`preset-time-${preset.key}`">Time (minutes)</label>
+              <div class="control">
+                <input
+                  :id="`preset-time-${preset.key}`"
+                  v-model.number="presetTimeByKey[preset.key]"
+                  class="input"
+                  type="number"
+                  min="1"
+                  placeholder="20"
+                />
+              </div>
+            </div>
+
+            <button class="button is-link is-small" @click="publishPresetWorkout(preset)">Publish</button>
+          </div>
+        </div>
+      </div>
+    </Sidebar>
   </section>
 </template>
 
 <style scoped>
+.sidebar-toggle {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 45;
+  border: 1px solid #c56a00;
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: #f39c12;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.7rem 0.9rem;
+  transition: right 0.3s ease-in-out;
+}
+
+.sidebar-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
 .stretch-grid {
   display: grid;
   gap: 0.5rem;
@@ -280,12 +343,41 @@ function presetStretchNames(stretchIds: number[]) {
 .preset-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .stretch-option {
   align-items: flex-start;
   display: flex;
   gap: 0.5rem;
+}
+
+.preset-box {
+  margin-bottom: 0;
+}
+
+.catalog-dropdown {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.catalog-item {
+  padding: 0.85rem 1rem;
+}
+
+.catalog-name {
+  display: block;
+  font-size: 1.02rem;
+}
+
+.catalog-meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.92rem;
+}
+
+.catalog-item + .catalog-item {
+  border-top: 1px solid #eee;
 }
 </style>

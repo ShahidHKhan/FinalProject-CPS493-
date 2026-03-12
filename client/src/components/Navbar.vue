@@ -53,7 +53,6 @@ function handleLogout() {
         <div class="navbar-start">
           <RouterLink to="/" class="navbar-item nav-link" @click="closeMenus">Home</RouterLink>
           <RouterLink to="/profile" class="navbar-item nav-link" @click="closeMenus">Profile</RouterLink>
-          <RouterLink to="/database" class="navbar-item nav-link" @click="closeMenus">Stretches</RouterLink>
           <RouterLink to="/friends" class="navbar-item nav-link" @click="closeMenus">Friends</RouterLink>
           <RouterLink to="/workouts" class="navbar-item nav-link" @click="closeMenus">Workouts</RouterLink>
           <RouterLink v-if="isAdmin" to="/admin" class="navbar-item nav-link" @click="closeMenus">Admin</RouterLink>

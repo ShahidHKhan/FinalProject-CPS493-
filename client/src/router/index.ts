@@ -18,13 +18,6 @@ const router = createRouter({
       },
     },
     {
-      path: '/database',
-      name: 'database',
-      component: function () {
-        return import('../views/StretchList.vue')
-      },
-    },
-    {
       path: '/friends',
       name: 'friends',
       component: function () {

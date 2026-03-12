@@ -111,7 +111,7 @@ function handleLogout() {
 
 .navbar-container-full {
   max-width: 100% !important;
-  padding-inline: 0;
+  padding-inline: 0.5in;
   width: 100%;
 }
 

@@ -1,6 +1,10 @@
+<script setup lang="ts">
+const footerLineText = 'CPS 493 - Midterm - Shahid Khan - 2026'
+</script>
+
 <template>
   <footer class="footer-min">
-    <p>Footer</p>
+    <p>{{ footerLineText }}</p>
   </footer>
 </template>
 

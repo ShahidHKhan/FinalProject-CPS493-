@@ -2,26 +2,8 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Workout } from './types'
 
-const STORAGE_KEY = 'mock-workouts'
-
-const loadStoredWorkouts = (): Workout[] => {
-  const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return []
-
-  try {
-    const parsed = JSON.parse(raw) as Workout[]
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-const persistWorkouts = (workouts: Workout[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(workouts))
-}
-
 export const useWorkoutStore = defineStore('workout', () => {
-  const workouts = ref<Workout[]>(loadStoredWorkouts())
+  const workouts = ref<Workout[]>([])
 
   const nextWorkoutId = computed(() => {
     if (workouts.value.length === 0) return 1
@@ -44,7 +26,6 @@ export const useWorkoutStore = defineStore('workout', () => {
     }
 
     workouts.value.unshift(workout)
-    persistWorkouts(workouts.value)
   }
 
   const workoutsByUser = (userId: number) =>

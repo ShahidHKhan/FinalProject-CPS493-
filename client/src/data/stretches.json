@@ -4,91 +4,91 @@
 		"name": "Overhead Triceps Stretch",
 		"category": "Upper Body",
 		"status": "Static",
-		"targetMuscles": ["Triceps", "Latissimus Dorsi"]
+		"targetMuscles": ["Arms", "Back"]
 	},
 	{
 		"id": 2,
 		"name": "Cross-Body Arm Stretch",
 		"category": "Upper Body",
 		"status": "Static",
-		"targetMuscles": ["Posterior Deltoids", "Triceps"]
+		"targetMuscles": ["Shoulders", "Arms"]
 	},
 	{
 		"id": 3,
 		"name": "Biceps Wall Stretch",
 		"category": "Upper Body",
 		"status": "Static",
-		"targetMuscles": ["Biceps", "Forearms"]
+		"targetMuscles": ["Arms"]
 	},
 	{
 		"id": 4,
 		"name": "Sleeper Stretch",
 		"category": "Upper Body",
 		"status": "Static",
-		"targetMuscles": ["Rear Deltoids", "Rotator Cuff"]
+		"targetMuscles": ["Shoulders"]
 	},
 	{
 		"id": 5,
 		"name": "Thread the Needle",
 		"category": "Upper Body",
 		"status": "Dynamic",
-		"targetMuscles": ["Shoulders", "Upper Back"]
+		"targetMuscles": ["Shoulders", "Back"]
 	},
 	{
 		"id": 6,
 		"name": "Shoulder Wall Slides",
 		"category": "Upper Body",
 		"status": "Dynamic",
-		"targetMuscles": ["Deltoids", "Scapular Stabilizers"]
+		"targetMuscles": ["Shoulders", "Back"]
 	},
 	{
 		"id": 7,
 		"name": "Doorway Chest Opener",
 		"category": "Upper Body",
 		"status": "Static",
-		"targetMuscles": ["Pectorals", "Anterior Deltoids"]
+		"targetMuscles": ["Chest", "Shoulders"]
 	},
 	{
 		"id": 8,
 		"name": "Cobra Chest Lift",
 		"category": "Upper Body",
 		"status": "Static",
-		"targetMuscles": ["Pectorals", "Abdominals"]
+		"targetMuscles": ["Chest", "Core"]
 	},
 	{
 		"id": 9,
 		"name": "Cat-Cow Flow",
 		"category": "Core",
 		"status": "Dynamic",
-		"targetMuscles": ["Lower Back", "Abdominals"]
+		"targetMuscles": ["Back", "Core"]
 	},
 	{
 		"id": 10,
 		"name": "Child's Pose Reach",
 		"category": "Core",
 		"status": "Static",
-		"targetMuscles": ["Latissimus Dorsi", "Erector Spinae"]
+		"targetMuscles": ["Back"]
 	},
 	{
 		"id": 11,
 		"name": "Seated Spinal Twist",
 		"category": "Core",
 		"status": "Static",
-		"targetMuscles": ["Obliques", "Thoracic Spine"]
+		"targetMuscles": ["Core", "Back"]
 	},
 	{
 		"id": 12,
 		"name": "Figure Four Stretch",
 		"category": "Lower Body",
 		"status": "Static",
-		"targetMuscles": ["Glutes", "Piriformis"]
+		"targetMuscles": ["Glutes"]
 	},
 	{
 		"id": 13,
 		"name": "Kneeling Glute Stretch",
 		"category": "Lower Body",
 		"status": "Static",
-		"targetMuscles": ["Glutes", "Hip Rotators"]
+		"targetMuscles": ["Glutes"]
 	},
 	{
 		"id": 14,
@@ -102,7 +102,7 @@
 		"name": "Side-Lying Quad Stretch",
 		"category": "Lower Body",
 		"status": "Static",
-		"targetMuscles": ["Quadriceps", "Rectus Femoris"]
+		"targetMuscles": ["Quadriceps"]
 	},
 	{
 		"id": 16,
@@ -123,27 +123,27 @@
 		"name": "Wall Calf Stretch",
 		"category": "Lower Body",
 		"status": "Static",
-		"targetMuscles": ["Calves", "Achilles Tendon"]
+		"targetMuscles": ["Calves"]
 	},
 	{
 		"id": 19,
 		"name": "World's Greatest Stretch",
 		"category": "Full Body",
 		"status": "Dynamic",
-		"targetMuscles": ["Hip Flexors", "Glutes", "Thoracic Spine"]
+		"targetMuscles": ["Full-Body"]
 	},
 	{
 		"id": 20,
 		"name": "Inchworm Walkout",
 		"category": "Full Body",
 		"status": "Dynamic",
-		"targetMuscles": ["Hamstrings", "Shoulders", "Core"]
+		"targetMuscles": ["Full-Body"]
 	},
 	{
 		"id": 21,
 		"name": "Downward Dog to Lunge Flow",
 		"category": "Full Body",
 		"status": "Dynamic",
-		"targetMuscles": ["Calves", "Hamstrings", "Shoulders", "Hip Flexors"]
+		"targetMuscles": ["Full-Body"]
 	}
 ]

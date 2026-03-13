@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
@@ -11,6 +12,22 @@ const workoutStore = useWorkoutStore()
 
 const { currentUser, availableAccounts } = storeToRefs(authStore)
 const { stretches } = storeToRefs(stretchStore)
+
+const muscleGroupOptions = [
+  'Shoulders',
+  'Chest',
+  'Back',
+  'Arms',
+  'Core',
+  'Glutes',
+  'Hip Flexors',
+  'Quadriceps',
+  'Hamstrings',
+  'Calves',
+  'Full-Body',
+] as const
+
+const selectedHealingMuscles = ref<string[]>([])
 
 const friendsList = computed(function () {
   if (!currentUser.value) return []
@@ -97,6 +114,36 @@ function stretchNamesByIds(stretchIds: number[]) {
                 </li>
               </ul>
             </div>
+
+            <h2 class="title is-4">Recovery Focus</h2>
+            <div class="box">
+              <p class="mb-3">
+                <strong>Muscles currently trying to heal / stretch:</strong>
+              </p>
+
+              <div class="muscle-options mb-4">
+                <label
+                  v-for="muscleGroup in muscleGroupOptions"
+                  :key="muscleGroup"
+                  class="checkbox muscle-option"
+                >
+                  <input v-model="selectedHealingMuscles" type="checkbox" :value="muscleGroup">
+                  <span>{{ muscleGroup }}</span>
+                </label>
+              </div>
+
+              <div v-if="selectedHealingMuscles.length > 0" class="selected-tags">
+                <span
+                  v-for="muscleGroup in selectedHealingMuscles"
+                  :key="muscleGroup"
+                  class="tag is-info is-light mr-2 mb-2"
+                >
+                  {{ muscleGroup }}
+                </span>
+              </div>
+
+              <p v-else class="has-text-grey is-size-7">No muscle groups selected yet.</p>
+            </div>
           </div>
         </div>
       </template>
@@ -113,5 +160,21 @@ function stretchNamesByIds(stretchIds: number[]) {
   align-items: center;
   display: flex;
   justify-content: space-between;
+}
+
+.muscle-options {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.muscle-option {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>

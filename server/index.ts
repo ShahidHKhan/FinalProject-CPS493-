@@ -1,14 +1,19 @@
+import { config } from 'dotenv';
 import express from 'express';
 import stretchesController from './controller/stretches';
 import usersController from './controller/users';
 
-const PORT = 3000;
-const SERVER = 'localhost';
+config();
+
+const PORT = process.env.PORT ?? 3000
+const SERVER = process.env.SERVER ?? 'localhost'
+const STATIC_DIR = process.env.STATIC_DIR ?? 'client/dist'
 
 const app = express();
 
 // Parse JSON bodies
 app.use(express.json());
+app.use(express.static(STATIC_DIR));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');

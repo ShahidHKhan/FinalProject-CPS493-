@@ -1,16 +1,23 @@
 import { Router } from 'express';
-import { get, getAll } from '../models/stretches';
+import { create, get, getAll, remove, update } from '../models/stretches';
+import type { Stretch } from '../models/stretches';
+import { DataEnvelope, DataListEnvelope } from '../types';
 
 const app = Router();
 
 app
-  .get('/', (_req, res) => {
-    const { stretches } = getAll();
+  .get('/', (req, res) => {
+    const { stretches, count } = getAll(req.query);
+    const dataEnvelope: DataListEnvelope<Stretch> = {
+      data: stretches,
+      isSuccess: true,
+      total: count,
+    };
 
-    res.send(stretches);
+    res.send(dataEnvelope);
   })
-  .get('/count', (_req, res) => {
-    const { count } = getAll();
+  .get('/count', (req, res) => {
+    const { count } = getAll(req.query);
 
     res.send({ count });
   })
@@ -20,6 +27,37 @@ app
     try {
       const stretch = get(stretchId);
       res.send(stretch);
+    } catch {
+      res.status(404).send({ isSuccess: false, message: 'Stretch not found' });
+    }
+  })
+  .post('/', (req, res) => {
+    const newStretch = create(req.body);
+
+    res.status(201).send(newStretch);
+  })
+  .patch('/:id', (req, res) => {
+    const stretchId = Number.parseInt(req.params.id, 10);
+
+    try {
+      const updatedStretch = update(stretchId, req.body);
+      res.send(updatedStretch);
+    } catch {
+      res.status(404).send({ isSuccess: false, message: 'Stretch not found' });
+    }
+  })
+  .delete('/:id', (req, res) => {
+    const stretchId = Number.parseInt(req.params.id, 10);
+
+    try {
+      const removedStretch = remove(stretchId);
+      const response: DataEnvelope<Stretch> = {
+        data: removedStretch,
+        isSuccess: true,
+        message: `${removedStretch.name} deleted`,
+      };
+
+      res.send(response);
     } catch {
       res.status(404).send({ isSuccess: false, message: 'Stretch not found' });
     }

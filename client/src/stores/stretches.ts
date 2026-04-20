@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Stretch } from './types'
-import { api } from '../services/myFetch'
+import { getStretches } from '../services/stretches'
 
 export const useStretchStore = defineStore('stretch', function () {
   const stretches = ref<Stretch[]>([])
@@ -13,8 +13,8 @@ export const useStretchStore = defineStore('stretch', function () {
     error.value = ''
 
     try {
-      const data = await api<Stretch[]>('/stretches')
-      stretches.value = data
+      const response = await getStretches()
+      stretches.value = response.data
     } catch {
       stretches.value = []
       error.value = 'Could not load stretches from the server.'

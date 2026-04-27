@@ -6,26 +6,26 @@ import { DataEnvelope, DataListEnvelope } from '../types';
 const app = Router();
 
 app
-  .get('/', (req, res) => {
-    const { stretches, count } = getAll(req.query);
+  .get('/', async (req, res) => {
+    const { list, count } = await getAll(req.query);
     const dataEnvelope: DataListEnvelope<Stretch> = {
-      data: stretches,
+      data: list,
       isSuccess: true,
       total: count,
     };
 
     res.send(dataEnvelope);
   })
-  .get('/count', (req, res) => {
-    const { count } = getAll(req.query);
+  .get('/count', async (req, res) => {
+    const { count } = await getAll(req.query);
 
     res.send({ count });
   })
-  .get('/:id', (req, res) => {
+  .get('/:id', async (req, res) => {
     const stretchId = Number.parseInt(req.params.id, 10);
 
     try {
-      const stretch = get(stretchId);
+      const stretch = await get(stretchId);
       res.send(stretch);
     } catch {
       res.status(404).send({ isSuccess: false, message: 'Stretch not found' });

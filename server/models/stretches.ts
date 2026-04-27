@@ -1,5 +1,8 @@
-import data from '../data/stretches.json';
+import data1 from '../data/stretches.json';
 import type { PagingRequest } from '../types';
+import { connect } from './supabase';
+
+export const TABLE_NAME = 'stretches';
 
 export type Stretch = {
   id: number;
@@ -9,99 +12,115 @@ export type Stretch = {
   targetMuscles: string[];
 };
 
-const stretches = data as Stretch[];
+type StretchRow = {
+  id: number;
+  name: string;
+  category: string;
+  status: string;
+  target_muscles: string[];
+};
 
-export function getAll(params: PagingRequest): { stretches: Stretch[]; count: number } {
-  let filteredStretches = [...stretches];
+type ItemType = Stretch;
+
+const data = {
+  items: data1 as Stretch[],
+};
+
+export async function getAll(params: PagingRequest): Promise<{ list: ItemType[]; count: number }> {
+  const db = connect();
+
+  let query = db.from(TABLE_NAME).select('*', { count: 'estimated' });
 
   if (params?.search) {
-    const search = params.search.toLowerCase();
-    filteredStretches = filteredStretches.filter((stretch) =>
-      `${stretch.name} ${stretch.category} ${stretch.status} ${stretch.targetMuscles.join(' ')}`
-        .toLowerCase()
-        .includes(search),
-    );
+    query = query.or(`name.ilike.%${params.search}%,category.ilike.%${params.search}%,status.ilike.%${params.search}%`);
   }
 
   if (params?.sortBy) {
-    filteredStretches.sort((a, b) => {
-      const aValue = a[params.sortBy as keyof Stretch];
-      const bValue = b[params.sortBy as keyof Stretch];
-
-      const normalizedA = Array.isArray(aValue) ? aValue.join(', ') : aValue;
-      const normalizedB = Array.isArray(bValue) ? bValue.join(', ') : bValue;
-
-      if (normalizedA < normalizedB) {
-        return params.descending ? 1 : -1;
-      }
-
-      if (normalizedA > normalizedB) {
-        return params.descending ? -1 : 1;
-      }
-
-      return 0;
-    });
+    query = query.order(params.sortBy as keyof StretchRow, { ascending: !params.descending });
   }
 
-  const count = filteredStretches.length;
-  const page = Number(params?.page) || 1;
-  const pageSize = Number(params?.pageSize) || 10;
+  const page = params?.page || 1;
+  const pageSize = params?.pageSize || 10;
   const start = (page - 1) * pageSize;
-  filteredStretches = filteredStretches.slice(start, start + pageSize);
+
+  const result = await query.range(start, start + pageSize - 1);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  const list = (result.data ?? []).map((stretch) => ({
+    id: stretch.id,
+    name: stretch.name,
+    category: stretch.category,
+    status: stretch.status,
+    targetMuscles: stretch.target_muscles,
+  })) as ItemType[];
+
+  const count = result.count ?? 0;
+
+  return { list, count };
+}
+
+export async function get(id: number): Promise<ItemType> {
+  const db = connect();
+  const result = await db.from(TABLE_NAME).select('*').eq('id', id).single();
+
+  if (result.error) {
+    const item = data.items.find((stretch) => stretch.id === id);
+
+    if (!item) {
+      const error = { status: 404, message: 'Stretch not found' };
+      throw error;
+    }
+
+    return item as ItemType;
+  }
 
   return {
-    stretches: filteredStretches,
-    count,
+    id: result.data.id,
+    name: result.data.name,
+    category: result.data.category,
+    status: result.data.status,
+    targetMuscles: result.data.target_muscles,
   };
 }
 
-export function get(id: number): Stretch {
-  const foundStretch = stretches.find((stretch) => stretch.id === id);
-
-  if (!foundStretch) {
-    throw new Error(`Stretch with ID ${id} not found`);
-  }
-
-  return foundStretch;
-}
-
-export function create(stretchInput: Omit<Stretch, 'id'>): Stretch {
-  const nextId = stretches.length > 0 ? Math.max(...stretches.map((stretch) => stretch.id)) + 1 : 1;
-
-  const createdStretch: Stretch = {
-    id: nextId,
+export function create(stretchInput: Omit<ItemType, 'id'>) {
+  const newStretch = {
     ...stretchInput,
+    id: data.items.length + 1,
   };
 
-  stretches.push(createdStretch);
-
-  return createdStretch;
+  data.items.push(newStretch as ItemType);
+  return newStretch;
 }
 
-export function update(id: number, stretchPatch: Partial<Omit<Stretch, 'id'>>): Stretch {
-  const stretchIndex = stretches.findIndex((stretch) => stretch.id === id);
+export function update(id: number, stretchPatch: Partial<ItemType>) {
+  const index = data.items.findIndex((stretch) => stretch.id === id);
 
-  if (stretchIndex === -1) {
-    throw new Error(`Stretch with ID ${id} not found`);
+  if (index === -1) {
+    const error = { status: 404, message: 'Stretch not found' };
+    throw error;
   }
 
-  stretches[stretchIndex] = {
-    ...stretches[stretchIndex],
+  const updatedStretch = {
+    ...data.items[index],
     ...stretchPatch,
-    id,
   };
 
-  return stretches[stretchIndex];
+  data.items[index] = updatedStretch as ItemType;
+  return updatedStretch;
 }
 
-export function remove(id: number): Stretch {
-  const stretchIndex = stretches.findIndex((stretch) => stretch.id === id);
+export function remove(id: number) {
+  const index = data.items.findIndex((stretch) => stretch.id === id);
 
-  if (stretchIndex === -1) {
-    throw new Error(`Stretch with ID ${id} not found`);
+  if (index === -1) {
+    const error = { status: 404, message: 'Stretch not found' };
+    throw error;
   }
 
-  const removedStretch = stretches.splice(stretchIndex, 1);
-
-  return removedStretch[0];
+  const removedStretch = data.items.splice(index, 1)[0];
+  return removedStretch as ItemType;
 }

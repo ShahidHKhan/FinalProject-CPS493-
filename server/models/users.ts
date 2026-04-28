@@ -1,85 +1,127 @@
-import data from '../data/users.json';
+import data1 from '../data/users.json';
 import type { PagingRequest, simpleUser } from '../types';
+import { connect } from './supabase';
 
-const users = data as simpleUser[];
 
-export function getAll(params: PagingRequest): { users: simpleUser[]; count: number } {
-  let filteredUsers = [...users];
-  const count = filteredUsers.length;
+export const TABLE_NAME = 'users';
+
+type ItemType = simpleUser;
+
+const data = {
+  items: data1 as ItemType[],
+};
+
+export async function getAll(params: PagingRequest): Promise<{ list: ItemType[]; count: number }> {
+  const db = connect();
+  let query = db.from(TABLE_NAME).select('*', { count: 'estimated' });
 
   if (params?.search) {
     const search = params.search.toLowerCase();
-    filteredUsers = filteredUsers.filter((currentUser) =>
-      `${currentUser.name} ${currentUser.role}`.toLowerCase().includes(search),
-    );
+    query = query.or(`name.ilike.%${search}%,role.ilike.%${search}%`);
   }
 
   if (params?.sortBy) {
-    filteredUsers.sort((a, b) => {
-      const aValue = a[params.sortBy as keyof simpleUser];
-      const bValue = b[params.sortBy as keyof simpleUser];
-
-      if (aValue < bValue) {
-        return params.descending ? 1 : -1;
-      }
-
-      if (aValue > bValue) {
-        return params.descending ? -1 : 1;
-      }
-
-      return 0;
-    });
+    query = query.order(params.sortBy, { ascending: !params.descending });
   }
 
   const page = params?.page || 1;
   const pageSize = params?.pageSize || 10;
   const start = (page - 1) * pageSize;
-  filteredUsers = filteredUsers.slice(start, start + pageSize);
 
-  return { users: filteredUsers, count };
-}
+  const result = await query.range(start, start + pageSize - 1);
 
-export function get(id: number): simpleUser {
-  const foundUser = users.find((currentUser) => currentUser.id === id);
-
-  if (!foundUser) {
-    throw new Error(`User with ID ${id} not found`);
+  if (result.error) {
+    throw result.error;
   }
 
-  return foundUser;
+  const list = (result.data ?? []).map((user) => ({
+    id: user.id,
+    name: user.name,
+    role: user.role,
+  })) as ItemType[];
+  const count = result.count ?? 0;
+
+  return { list, count };
 }
 
-export function create(userInput: Omit<simpleUser, 'id'>): simpleUser {
-  const createdUser: simpleUser = {
-    id: users.length + 1,
-    ...userInput,
+export async function get(id: number): Promise<ItemType> {
+  const db = connect();
+  const result = await db.from(TABLE_NAME).select('*').eq('id', id).single();
+
+  if (result.error) {
+    const foundUser = data.items.find((currentUser) => currentUser.id === id);
+
+    if (!foundUser) {
+      const error = { status: 404, message: 'User not found' };
+      throw error;
+    }
+
+    return foundUser;
+  }
+
+  return {
+    id: result.data.id,
+    name: result.data.name,
+    role: result.data.role,
   };
-
-  users.push(createdUser);
-
-  return createdUser;
 }
 
-export function update(id: number, userPatch: Partial<simpleUser>): simpleUser {
-  const userIndex = users.findIndex((currentUser) => currentUser.id === id);
+export async function create(userInput: Omit<ItemType, 'id'>): Promise<ItemType> {
+  const db = connect();
+  const result = await db.from(TABLE_NAME).insert(userInput).select().single();
 
-  if (userIndex === -1) {
-    throw new Error(`User with ID ${id} not found`);
+  if (result.error) {
+    throw result.error;
   }
 
-  users[userIndex] = { ...users[userIndex], ...userPatch };
-
-  return users[userIndex];
+  return {
+    id: result.data.id,
+    name: result.data.name,
+    role: result.data.role,
+  };
 }
 
-export function remove(id: number): simpleUser {
-  const userIndex = users.findIndex((currentUser) => currentUser.id === id);
+export async function update(id: number, userPatch: Partial<ItemType>): Promise<ItemType> {
+  const db = connect();
+  const result = await db.from(TABLE_NAME).update(userPatch).eq('id', id).select().single();
 
-  if (userIndex === -1) {
-    throw new Error('User not found');
+  if (result.error) {
+    throw result.error;
   }
 
-  const removedUser = users.splice(userIndex, 1);
+  return {
+    id: result.data.id,
+    name: result.data.name,
+    role: result.data.role,
+  };
+}
 
-  return removedUser[0];
+export async function remove(id: number): Promise<ItemType> {
+  const db = connect();
+  const result = await db.from(TABLE_NAME).delete().eq('id', id).select().single();
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return {
+    id: result.data.id,
+    name: result.data.name,
+    role: result.data.role,
+  };
+}
+
+export async function seed() {
+  const db = connect();
+  const items = data.items.map((item) => ({
+    name: item.name,
+    role: item.role,
+  }));
+  const result = await db.from(TABLE_NAME).insert(items);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result.count ?? items.length;
 }

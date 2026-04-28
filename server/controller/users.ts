@@ -1,53 +1,66 @@
 import { Router } from 'express';
+import type { PagingRequest } from '../types';
 import { create, get, getAll, remove, update } from '../models/users';
 import { DataEnvelope, DataListEnvelope, simpleUser } from '../types';
+import { requireAuth } from "../middleware/auth"
 
 const app = Router();
 
 app
-	.get('/', (req, res) => {
-		const { users, count } = getAll(req.query);
-		const sanitizedUsers = users.map(({ id, name, role }) => ({ id, name, role }));
-		const dataEnvelope: DataListEnvelope<simpleUser> = {
-			data: sanitizedUsers,
-			isSuccess: true,
-			total: count,
-		};
+	.get("/", requireAuth("admin"), async (req, res) => {
+		try {
+			const { list, count } = await getAll(req.query as unknown as PagingRequest);
+			const dataEnvelope: DataListEnvelope<simpleUser> = {
+				data: list,
+				isSuccess: true,
+				total: count,
+			};
 
-		res.send(dataEnvelope);
+			res.send(dataEnvelope);
+		} catch {
+			res.status(500).send({ isSuccess: false, message: 'Failed to load users' });
+		}
 	})
-	.get('/count', (req, res) => {
-		const { count } = getAll(req.query);
+	.get('/count', requireAuth("admin"), async (req, res) => {
+		try {
+			const { count } = await getAll(req.query as unknown as PagingRequest);
 
-		res.send({ count });
+			res.send({ count });
+		} catch {
+			res.status(500).send({ isSuccess: false, message: 'Failed to load users' });
+		}
 	})
-	.get('/:id', (req, res) => {
+	.get('/:id', requireAuth("admin"), async (req, res) => {
 		const userId = Number.parseInt(req.params.id, 10);
 		try {
-			const foundUser = get(userId);
+			const foundUser = await get(userId);
 			res.send(foundUser);
 		} catch {
 			res.status(404).send({ isSuccess: false, message: 'User not found' });
 		}
 	})
-	.post('/', (req, res) => {
-		const newUser = create(req.body);
+	.post('/', requireAuth("admin"), async (req, res) => {
+		try {
+			const newUser = await create(req.body);
 
-		res.status(201).send(newUser);
+			res.status(201).send(newUser);
+		} catch {
+			res.status(500).send({ isSuccess: false, message: 'Failed to create user' });
+		}
 	})
-	.patch('/:id', (req, res) => {
+	.patch('/:id', requireAuth("admin"), async (req, res) => {
 		const userId = Number.parseInt(req.params.id, 10);
 		try {
-			const updatedUser = update(userId, req.body);
+			const updatedUser = await update(userId, req.body);
 			res.send(updatedUser);
 		} catch {
 			res.status(404).send({ isSuccess: false, message: 'User not found' });
 		}
 	})
-	.delete('/:id', (req, res) => {
+	.delete('/:id', requireAuth("admin"), async (req, res) => {
 		const userId = Number.parseInt(req.params.id, 10);
 		try {
-			const removedUser = remove(userId);
+			const removedUser = await remove(userId);
 			const response: DataEnvelope<simpleUser> = {
 				data: removedUser,
 				isSuccess: true,

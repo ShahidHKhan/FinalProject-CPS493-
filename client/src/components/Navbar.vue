@@ -195,6 +195,16 @@ function handleLogout() {
   align-items: center;
 }
 
+/* Ensure the dropdown arrow doesn't overlap the text */
+.nav-admin-link {
+  position: relative;
+  padding-right: 1.6rem;
+}
+
+.nav-admin-link::after {
+  right: 0.6rem;
+}
+
 .user-chip {
   display: flex;
   align-items: center;

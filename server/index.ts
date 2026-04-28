@@ -3,6 +3,8 @@ import 'dotenv/config';
 import express from 'express';
 import stretchesController from './controller/stretches';
 import usersController from './controller/users';
+import workoutsController from './controller/workouts';
+import workoutPresetsController from './controller/workoutPresets';
 import { requireAuth, validateJWT } from "./middleware/auth"
 
 const PORT = process.env.PORT ?? 3000
@@ -32,6 +34,8 @@ app.use(express.static(STATIC_DIR));
 
 app.use('/api/v1/users', usersController);
 app.use('/api/v1/stretches', stretchesController);
+app.use('/api/v1/workouts', workoutsController);
+app.use('/api/v1/workout-presets', workoutPresetsController);
 
 app.get('/', (req, res) => {
     res.send('Hello, World!');

@@ -1,5 +1,5 @@
 [
 	{ "id": 1, "name": "Admin Alice", "role": "admin" },
-	{ "id": 2, "name": "Regular Bob", "role": "regular" },
-	{ "id": 3, "name": "Regular Charlie", "role": "regular" }
+	{ "id": 2, "name": "Regular Bob", "role": "user" },
+	{ "id": 3, "name": "Regular Charlie", "role": "user" }
 ]

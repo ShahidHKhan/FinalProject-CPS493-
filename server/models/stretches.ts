@@ -1,6 +1,6 @@
-import data1 from '../data/stretches.json';
 import type { PagingRequest } from '../types';
-import { connect } from './supabase';
+import data1 from '../data/stretches.json';
+import { connect, filterKeys, toSnakeCase } from './supabase';
 
 export const TABLE_NAME = 'stretches';
 
@@ -22,9 +22,26 @@ type StretchRow = {
 
 type ItemType = Stretch;
 
-const data = {
-  items: data1 as Stretch[],
-};
+type StretchInput = Omit<ItemType, 'id'>;
+
+function toDbRow(stretch: StretchInput) {
+  return {
+    name: stretch.name,
+    category: stretch.category,
+    status: stretch.status.toLowerCase(),
+    target_muscles: stretch.targetMuscles,
+  };
+}
+
+function fromDbRow(stretch: StretchRow): ItemType {
+  return {
+    id: stretch.id,
+    name: stretch.name,
+    category: stretch.category,
+    status: stretch.status,
+    targetMuscles: stretch.target_muscles,
+  };
+}
 
 export async function getAll(params: PagingRequest): Promise<{ list: ItemType[]; count: number }> {
   const db = connect();
@@ -56,13 +73,7 @@ export async function getAll(params: PagingRequest): Promise<{ list: ItemType[];
     throw result.error;
   }
 
-  const list = (result.data ?? []).map((stretch) => ({
-    id: stretch.id,
-    name: stretch.name,
-    category: stretch.category,
-    status: stretch.status,
-    targetMuscles: stretch.target_muscles,
-  })) as ItemType[];
+  const list = (result.data ?? []).map((stretch) => fromDbRow(stretch as StretchRow));
 
   const count = result.count ?? 0;
 
@@ -74,60 +85,84 @@ export async function get(id: number): Promise<ItemType> {
   const result = await db.from(TABLE_NAME).select('*').eq('id', id).single();
 
   if (result.error) {
-    const item = data.items.find((stretch) => stretch.id === id);
-
-    if (!item) {
-      const error = { status: 404, message: 'Stretch not found' };
-      throw error;
-    }
-
-    return item as ItemType;
-  }
-
-  return {
-    id: result.data.id,
-    name: result.data.name,
-    category: result.data.category,
-    status: result.data.status,
-    targetMuscles: result.data.target_muscles,
-  };
-}
-
-export function create(stretchInput: Omit<ItemType, 'id'>) {
-  const newStretch = {
-    ...stretchInput,
-    id: data.items.length + 1,
-  };
-
-  data.items.push(newStretch as ItemType);
-  return newStretch;
-}
-
-export function update(id: number, stretchPatch: Partial<ItemType>) {
-  const index = data.items.findIndex((stretch) => stretch.id === id);
-
-  if (index === -1) {
     const error = { status: 404, message: 'Stretch not found' };
     throw error;
   }
 
-  const updatedStretch = {
-    ...data.items[index],
-    ...stretchPatch,
-  };
-
-  data.items[index] = updatedStretch as ItemType;
-  return updatedStretch;
+  return fromDbRow(result.data as StretchRow);
 }
 
-export function remove(id: number) {
-  const index = data.items.findIndex((stretch) => stretch.id === id);
+export async function create(stretchInput: StretchInput): Promise<ItemType> {
+  const db = connect();
+  const result = await db.from(TABLE_NAME).insert(toDbRow(stretchInput)).select('*').single();
 
-  if (index === -1) {
-    const error = { status: 404, message: 'Stretch not found' };
-    throw error;
+  if (result.error) {
+    throw result.error;
   }
 
-  const removedStretch = data.items.splice(index, 1)[0];
-  return removedStretch as ItemType;
+  return fromDbRow(result.data as StretchRow);
+}
+
+export async function update(id: number, stretchPatch: Partial<ItemType>): Promise<ItemType> {
+  const db = connect();
+  const updateRow: Record<string, unknown> = {};
+
+  if (stretchPatch.name !== undefined) {
+    updateRow.name = stretchPatch.name;
+  }
+
+  if (stretchPatch.category !== undefined) {
+    updateRow.category = stretchPatch.category;
+  }
+
+  if (stretchPatch.status !== undefined) {
+    updateRow.status = stretchPatch.status.toLowerCase();
+  }
+
+  if (stretchPatch.targetMuscles !== undefined) {
+    updateRow.target_muscles = stretchPatch.targetMuscles;
+  }
+
+  if (Object.keys(updateRow).length === 0) {
+    return get(id);
+  }
+
+  const result = await db.from(TABLE_NAME).update(updateRow).eq('id', id).select('*').single();
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return fromDbRow(result.data as StretchRow);
+}
+
+export async function remove(id: number): Promise<ItemType> {
+  const existing = await get(id);
+  const db = connect();
+  const result = await db.from(TABLE_NAME).delete().eq('id', id);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return existing;
+}
+
+export async function seed(): Promise<number> {
+  const db = connect();
+
+  const data = {
+    items: data1 as Stretch[],
+  };
+
+  const stretchKeys = ['name', 'category', 'status', 'targetMuscles'];
+
+  const items = data.items.map((item) => toSnakeCase(filterKeys(item as any, stretchKeys)));
+  const result = await db.from(TABLE_NAME).insert(items);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result.count ?? 0;
 }

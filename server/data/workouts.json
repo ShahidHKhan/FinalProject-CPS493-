@@ -1,0 +1,14 @@
+[
+  {
+    "userId": 2,
+    "title": "Bob's Morning",
+    "workoutTimeMinutes": 15,
+    "stretches": ["Cat-Cow Flow", "Child's Pose Reach", "Seated Spinal Twist"]
+  },
+  {
+    "userId": 3,
+    "title": "Charlie's Quick Warmup",
+    "workoutTimeMinutes": 10,
+    "stretches": ["Overhead Triceps Stretch", "Doorway Chest Opener", "World's Greatest Stretch"]
+  }
+]

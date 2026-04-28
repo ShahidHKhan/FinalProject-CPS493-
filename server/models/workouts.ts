@@ -1,5 +1,6 @@
 import type { PagingRequest } from '../types';
-import { connect } from './supabase';
+import data1 from '../data/workouts.json';
+import { connect, filterKeys, toSnakeCase } from './supabase';
 
 export const TABLE_NAME = 'workouts';
 const WORKOUT_STRETCHES_TABLE_NAME = 'workout_stretches';
@@ -227,4 +228,49 @@ export async function remove(id: number): Promise<Workout> {
   }
 
   return existing;
+}
+
+export async function seed(): Promise<number> {
+  const db = connect();
+
+  const data = {
+    items: data1 as Array<Record<string, any>>,
+  };
+
+  // prepare items for insert
+  const workoutKeys = ['userId', 'title', 'workoutTimeMinutes'];
+  const items = data.items.map((item) => {
+    const snake = toSnakeCase(filterKeys(item, workoutKeys));
+    // ensure published_at
+    return { ...snake, published_at: new Date().toISOString() };
+  });
+
+  const existingRes = await db.from(TABLE_NAME).select('id, title');
+  if (existingRes.error) throw existingRes.error;
+  const existingTitles = new Set((existingRes.data ?? []).map((r: any) => r.title));
+
+  const toCreate = items.filter((i: any) => !existingTitles.has(i.title));
+  if (toCreate.length === 0) return 0;
+
+  const inserted = await db.from(TABLE_NAME).insert(toCreate).select('*');
+  if (inserted.error) throw inserted.error;
+
+  // map stretches by name
+  const allStretchNames = data.items.flatMap((w: any) => w.stretches || []);
+  const stretchRows = await db.from('stretches').select('id, name').in('name', allStretchNames);
+  if (stretchRows.error) throw stretchRows.error;
+  const stretchByName = new Map<string, number>();
+  (stretchRows.data ?? []).forEach((r: any) => stretchByName.set(r.name, r.id));
+
+  for (const created of inserted.data ?? []) {
+    const original = data.items.find((w: any) => w.title === created.title);
+    if (!original) continue;
+    const stretchIds = (original.stretches || []).map((n: string) => stretchByName.get(n)).filter(Boolean) as number[];
+    if (stretchIds.length === 0) continue;
+    const rows = stretchIds.map((sId, idx) => ({ workout_id: created.id, stretch_id: sId, sort_order: idx + 1 }));
+    const r = await db.from(WORKOUT_STRETCHES_TABLE_NAME).insert(rows);
+    if (r.error) throw r.error;
+  }
+
+  return inserted.data?.length ?? toCreate.length;
 }

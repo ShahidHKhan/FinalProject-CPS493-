@@ -1,5 +1,6 @@
 import type { PagingRequest } from '../types';
-import { connect } from './supabase';
+import data1 from '../data/workoutPresets.json';
+import { connect, filterKeys, toSnakeCase } from './supabase';
 
 export const TABLE_NAME = 'workout_presets';
 const PRESET_STRETCHES_TABLE_NAME = 'workout_preset_stretches';
@@ -227,4 +228,46 @@ export async function remove(id: number): Promise<WorkoutPreset> {
   }
 
   return existing;
+}
+
+export async function seed(): Promise<number> {
+  const db = connect();
+
+  const data = {
+    items: data1 as Array<Record<string, any>>,
+  };
+
+  // Filter and convert main preset fields
+  const presetKeys = ['name', 'description', 'isSystemPreset', 'createdByUserId'];
+  const items = data.items.map((item) => toSnakeCase(filterKeys(item, presetKeys)));
+
+  const existingRes = await db.from(TABLE_NAME).select('id, name');
+  if (existingRes.error) throw existingRes.error;
+  const existingNames = new Set((existingRes.data ?? []).map((r: any) => r.name));
+
+  const toCreate = items.filter((i: any) => !existingNames.has(i.name));
+  if (toCreate.length === 0) return 0;
+
+  const insertedRes = await db.from(TABLE_NAME).insert(toCreate).select('*');
+  if (insertedRes.error) throw insertedRes.error;
+
+  // map stretch names from original data to ids
+  const allStretchNames = data.items.flatMap((p: any) => p.stretches || []);
+  const stretchRows = await db.from('stretches').select('id, name').in('name', allStretchNames);
+  if (stretchRows.error) throw stretchRows.error;
+  const stretchByName = new Map<string, number>();
+  (stretchRows.data ?? []).forEach((r: any) => stretchByName.set(r.name, r.id));
+
+  // insert preset stretches for created presets
+  for (const preset of insertedRes.data ?? []) {
+    const original = data.items.find((p: any) => p.name === preset.name);
+    if (!original) continue;
+    const stretchIds = (original.stretches || []).map((n: string) => stretchByName.get(n)).filter(Boolean) as number[];
+    if (stretchIds.length === 0) continue;
+    const rows = stretchIds.map((sid, idx) => ({ preset_id: preset.id, stretch_id: sid, sort_order: idx + 1 }));
+    const r = await db.from(PRESET_STRETCHES_TABLE_NAME).insert(rows);
+    if (r.error) throw r.error;
+  }
+
+  return insertedRes.data?.length ?? toCreate.length;
 }

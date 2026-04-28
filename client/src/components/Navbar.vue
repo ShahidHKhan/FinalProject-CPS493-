@@ -198,11 +198,11 @@ function handleLogout() {
 /* Ensure the dropdown arrow doesn't overlap the text */
 .nav-admin-link {
   position: relative;
-  padding-right: 1.6rem;
+  padding-right: 1.35rem;
 }
 
 .nav-admin-link::after {
-  right: 0.6rem;
+  display: none;
 }
 
 .user-chip {

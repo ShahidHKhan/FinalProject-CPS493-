@@ -16,7 +16,7 @@ const props = withDefaults(
     :class="{ 'is-active': props.isActive }"
     :style="{
       '--sidebar-width': `${props.width}px`,
-      '--sidebar-offset': props.isActive ? '0' : '90%',
+      '--sidebar-offset': props.isActive ? '0' : '100%',
     }"
   >
     <slot />
@@ -36,6 +36,7 @@ const props = withDefaults(
   transition: transform 0.3s ease-in-out;
   background: #fff;
   z-index: 40;
+  will-change: transform;
 }
 
 .side-bar.is-active {

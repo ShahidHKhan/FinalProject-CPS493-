@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Upper Body Quick",
+    "description": "Quick upper body routine",
+    "isSystemPreset": true,
+    "createdByUserId": 1,
+    "stretches": ["Overhead Triceps Stretch", "Cross-Body Arm Stretch", "Thread the Needle", "Shoulder Wall Slides"]
+  },
+  {
+    "name": "Lower Body Basic",
+    "description": "Foundational lower-body stretches",
+    "isSystemPreset": true,
+    "createdByUserId": 1,
+    "stretches": ["Figure Four Stretch", "Kneeling Glute Stretch", "Standing Quad Stretch", "Side-Lying Quad Stretch"]
+  },
+  {
+    "name": "Full Body Flow",
+    "description": "Flow through full body mobility",
+    "isSystemPreset": true,
+    "createdByUserId": 1,
+    "stretches": ["World's Greatest Stretch", "Inchworm Walkout", "Downward Dog to Lunge Flow"]
+  }
+]

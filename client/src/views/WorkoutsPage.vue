@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
@@ -12,6 +12,14 @@ const workoutStore = useWorkoutStore()
 
 const { currentUser } = storeToRefs(authStore)
 const { stretches, isLoading, error } = storeToRefs(stretchStore)
+const { workouts, isLoading: isLoadingWorkouts, error: workoutError } = storeToRefs(workoutStore)
+
+const currentUserWorkouts = computed(function () {
+  if (!currentUser.value) return []
+  return workouts.value.filter(function (workout) {
+    return workout.userId === currentUser.value?.id
+  })
+})
 
 const isCreatingWorkout = ref(false)
 const isSidebarActive = ref(false)
@@ -135,7 +143,7 @@ function cancelCreate() {
   resetForm()
 }
 
-function publishWorkout() {
+async function publishWorkout() {
   if (!currentUser.value) return
 
   const trimmedTitle = title.value.trim()
@@ -155,7 +163,7 @@ function publishWorkout() {
     return
   }
 
-  workoutStore.publishWorkout({
+  await workoutStore.publishWorkout({
     userId: currentUser.value.id,
     title: trimmedTitle,
     workoutTimeMinutes: workoutTimeMinutes.value,
@@ -166,7 +174,7 @@ function publishWorkout() {
   resetForm()
 }
 
-function publishPresetWorkout(preset: PresetWorkout) {
+async function publishPresetWorkout(preset: PresetWorkout) {
   if (!currentUser.value) return
 
   if (preset.stretchIds.length === 0) {
@@ -181,7 +189,7 @@ function publishPresetWorkout(preset: PresetWorkout) {
     return
   }
 
-  workoutStore.publishWorkout({
+  await workoutStore.publishWorkout({
     userId: currentUser.value.id,
     title: preset.title,
     workoutTimeMinutes: timeMinutes,
@@ -209,6 +217,14 @@ function presetStretchNames(stretchIds: number[]) {
     return stretchNameById(stretchId)
   }).join(', ')
 }
+
+onMounted(function () {
+  void workoutStore.loadWorkouts()
+})
+
+watch(currentUser, function () {
+  void workoutStore.loadWorkouts()
+})
 </script>
 
 <template>
@@ -220,7 +236,7 @@ function presetStretchNames(stretchIds: number[]) {
       :style="{ right: isSidebarActive ? `${sidebarWidth}px` : '0px' }"
       @click="toggleSidebar"
     >
-      Presets
+      Preset
     </button>
     <div class="container">
       <div v-if="!currentUser" class="notification is-warning is-light">
@@ -229,6 +245,29 @@ function presetStretchNames(stretchIds: number[]) {
 
       <template v-else>
         <h1 class="title">Workouts</h1>
+
+        <div class="box mb-5">
+          <h2 class="title is-5 mb-3">Your Saved Workouts</h2>
+
+          <div v-if="isLoadingWorkouts" class="notification is-info is-light py-3">
+            Loading workouts...
+          </div>
+          <div v-else-if="workoutError" class="notification is-danger is-light py-3">
+            {{ workoutError }}
+          </div>
+          <div v-else-if="currentUserWorkouts.length === 0" class="has-text-grey">
+            No saved workouts yet.
+          </div>
+
+          <div v-else class="workout-list">
+            <article v-for="workout in currentUserWorkouts" :key="workout.id" class="box workout-card">
+              <h3 class="title is-6 mb-2">{{ workout.title }}</h3>
+              <p class="mb-1"><strong>Time:</strong> {{ workout.workoutTimeMinutes }} minutes</p>
+              <p class="mb-1"><strong>Stretches:</strong> {{ workout.stretchIds.length }}</p>
+              <p class="has-text-grey is-size-7">Published: {{ workout.publishedAt }}</p>
+            </article>
+          </div>
+        </div>
 
         <h2 class="title is-4">Custom Workout</h2>
 
@@ -374,7 +413,9 @@ function presetStretchNames(stretchIds: number[]) {
   background: #f39c12;
   color: #ffffff;
   font-weight: 700;
-  padding: 0.7rem 0.9rem;
+  font-size: 1.05rem;
+  min-height: 3.5rem;
+  padding: 0.95rem 1.35rem;
   transition: right 0.3s ease-in-out;
 }
 
@@ -403,6 +444,15 @@ function presetStretchNames(stretchIds: number[]) {
 }
 
 .preset-box {
+  margin-bottom: 0;
+}
+
+.workout-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.workout-card {
   margin-bottom: 0;
 }
 

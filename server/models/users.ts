@@ -1,15 +1,10 @@
-import data1 from '../data/users.json';
 import type { PagingRequest, simpleUser } from '../types';
-import { connect } from './supabase';
-
+import { connect, filterKeys, toSnakeCase } from './supabase';
+import data1 from '../data/users.json';
 
 export const TABLE_NAME = 'users';
 
 type ItemType = simpleUser;
-
-const data = {
-  items: data1 as ItemType[],
-};
 
 export async function getAll(params: PagingRequest): Promise<{ list: ItemType[]; count: number }> {
   const db = connect();
@@ -49,14 +44,8 @@ export async function get(id: number): Promise<ItemType> {
   const result = await db.from(TABLE_NAME).select('*').eq('id', id).single();
 
   if (result.error) {
-    const foundUser = data.items.find((currentUser) => currentUser.id === id);
-
-    if (!foundUser) {
-      const error = { status: 404, message: 'User not found' };
-      throw error;
-    }
-
-    return foundUser;
+    const error = { status: 404, message: 'User not found' };
+    throw error;
   }
 
   return {
@@ -113,10 +102,11 @@ export async function remove(id: number): Promise<ItemType> {
 
 export async function seed() {
   const db = connect();
-  const items = data.items.map((item) => ({
-    name: item.name,
-    role: item.role,
-  }));
+  const data = {
+    items: data1 as ItemType[],
+  };
+
+  const items = data.items.map((item) => toSnakeCase(filterKeys(item as any, ['name', 'role'])));
   const result = await db.from(TABLE_NAME).insert(items);
 
   if (result.error) {

@@ -1,39 +1,78 @@
 import { defineStore } from 'pinia'
+import type { DataEnvelope, user as User } from '../../../server/types'
 import { computed, ref } from 'vue'
-import type { User } from './types'
-import * as myFetch from '../services/myFetch'
 
-export const useSessionStore = defineStore('session', function () {
+import { api as myApi } from '../services/myFetch'
+
+export type FeedbackMessage = {
+	type: 'success' | 'danger' | 'info'
+	text: string
+}
+
+export const useSessionStore = defineStore('session', () => {
 	const user = ref<User | null>(null)
-	const messages = ref<string[]>([])
+	const token = ref<string | null>(null)
+
+	async function login(email: string, password: string) {
+		const response = await myApi<DataEnvelope<{ user: User; token: string }>>(
+			'users/login',
+			{ email, password },
+			{ method: 'POST' },
+		)
+		if (!response.isSuccess) {
+			addMessage(response.message || 'Login failed', 'danger')
+			return
+		}
+		const { user: loggedInUser, token: authToken } = response.data
+		user.value = loggedInUser
+		token.value = authToken
+	}
+
+	function logout() {
+		user.value = null
+		token.value = null
+	}
+
+	const messages = ref<FeedbackMessage[]>([])
+	function addMessage(text: string, type: FeedbackMessage['type'] = 'info') {
+		messages.value.push({ type, text })
+	}
+	function handleError(error: Error | string) {
+		const message = typeof error === 'string' ? error : error.message
+		addMessage(message, 'danger')
+		console.error(error)
+	}
 
 	const loadingCount = ref(0)
-	const isLoading = computed(function () {
-		return loadingCount.value > 0
-	})
-
-	function addMessage(message: string) {
-		messages.value.push(message)
-	}
-
-	function clearMessages() {
-		messages.value = []
-	}
+	const isLoading = computed(() => loadingCount.value > 0)
 
 	function api<T>(endpoint: string, data?: unknown, options: RequestInit = {}) {
 		loadingCount.value++
 
-		return myFetch.api<T>(endpoint, data, options).finally(function () {
-			loadingCount.value--
-		})
+		options.headers = {
+			...(token.value ? { Authorization: `Bearer ${token.value}` } : {}),
+			...options.headers,
+		}
+
+		return myApi<T>(endpoint, data, options)
+			.catch((error) => {
+				handleError(error)
+				throw error
+			})
+			.finally(() => {
+				loadingCount.value--
+			})
 	}
 
 	return {
 		user,
+		token,
+		login,
+		logout,
 		messages,
-		isLoading,
 		addMessage,
-		clearMessages,
+		handleError,
+		isLoading,
 		api,
 	}
 })

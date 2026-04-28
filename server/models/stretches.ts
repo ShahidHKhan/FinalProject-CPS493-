@@ -39,11 +39,18 @@ export async function getAll(params: PagingRequest): Promise<{ list: ItemType[];
     query = query.order(params.sortBy as keyof StretchRow, { ascending: !params.descending });
   }
 
-  const page = params?.page || 1;
-  const pageSize = params?.pageSize || 10;
-  const start = (page - 1) * pageSize;
+  // When no paging is requested by the client, return the full list (Supabase default cap still applies).
+  if (params?.page !== undefined || params?.pageSize !== undefined) {
+    const parsedPage = Number(params?.page);
+    const parsedPageSize = Number(params?.pageSize);
+    const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+    const pageSize = Number.isFinite(parsedPageSize) && parsedPageSize > 0 ? parsedPageSize : 10;
+    const start = (page - 1) * pageSize;
 
-  const result = await query.range(start, start + pageSize - 1);
+    query = query.range(start, start + pageSize - 1);
+  }
+
+  const result = await query;
 
   if (result.error) {
     throw result.error;

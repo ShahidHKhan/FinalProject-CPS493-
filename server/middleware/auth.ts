@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express"
-import { verify } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import type { JwtPayload } from "jsonwebtoken"
 import type { user as User } from "../types"
 
@@ -19,7 +19,7 @@ export function validateJWT(req: Request, _res: Response, next: NextFunction) {
         return next()
     }
 
-    verify(token, process.env.JWT_SECRET as string, (err: any, decoded: string | JwtPayload | undefined) => {
+    jwt.verify(token, process.env.JWT_SECRET as string, (err: any, decoded: string | JwtPayload | undefined) => {
         if (err) {
             return next(err)
         }

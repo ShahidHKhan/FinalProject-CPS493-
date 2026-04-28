@@ -7,6 +7,20 @@ import { requireAuth } from "../middleware/auth"
 const app = Router();
 
 app
+	.get('/account-options', async (_req, res) => {
+		try {
+			const { list, count } = await getAll({ page: 1, pageSize: 1000 });
+			const dataEnvelope: DataListEnvelope<simpleUser> = {
+				data: list,
+				isSuccess: true,
+				total: count,
+			};
+
+			res.send(dataEnvelope);
+		} catch {
+			res.status(500).send({ isSuccess: false, message: 'Failed to load account options' });
+		}
+	})
 	.get("/", requireAuth("admin"), async (req, res) => {
 		try {
 			const { list, count } = await getAll(req.query as unknown as PagingRequest);

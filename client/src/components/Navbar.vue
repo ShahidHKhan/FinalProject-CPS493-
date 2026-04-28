@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import type { User } from '../stores/types'
 
 const authStore = useAuthStore()
-const { availableAccounts, currentUser, isAdmin } = storeToRefs(authStore)
+const { availableAccounts, currentUser, isAdmin, isLoadingAccounts, accountLoadError } = storeToRefs(authStore)
 const { loginAs, logout } = authStore
 
 const showLoginMenu = ref(false)
@@ -109,6 +109,15 @@ function handleLogout() {
 
               <div id="login-menu" class="dropdown-menu" role="menu">
                 <div class="dropdown-content">
+                  <div v-if="isLoadingAccounts" class="dropdown-item is-size-7 has-text-grey">
+                    Loading accounts...
+                  </div>
+                  <div v-else-if="accountLoadError" class="dropdown-item is-size-7 has-text-danger">
+                    {{ accountLoadError }}
+                  </div>
+                  <div v-else-if="availableAccounts.length === 0" class="dropdown-item is-size-7 has-text-grey">
+                    No accounts found.
+                  </div>
                   <button
                     v-for="account in availableAccounts"
                     :key="account.id"

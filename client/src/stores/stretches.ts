@@ -13,7 +13,7 @@ export const useStretchStore = defineStore('stretch', function () {
     error.value = ''
 
     try {
-      const response = await getStretches()
+      const response = await getStretches({ page: 1, pageSize: 1000 })
       stretches.value = response.data
     } catch {
       stretches.value = []

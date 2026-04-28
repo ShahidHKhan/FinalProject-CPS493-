@@ -1,5 +1,4 @@
-import { config } from 'dotenv';
-config();
+import 'dotenv/config';
 
 import express from 'express';
 import stretchesController from './controller/stretches';

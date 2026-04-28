@@ -40,7 +40,7 @@ export const useAuthStore = defineStore('auth', function () {
     accountLoadError.value = ''
 
     try {
-      const response = await api<UserListResponse>('/users')
+      const response = await api<UserListResponse>('/users/account-options')
       accountOptions.value = response.data
     } catch {
       accountLoadError.value = 'Unable to load accounts from the server.'

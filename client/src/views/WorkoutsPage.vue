@@ -11,7 +11,7 @@ const stretchStore = useStretchStore()
 const workoutStore = useWorkoutStore()
 
 const { currentUser } = storeToRefs(authStore)
-const { stretches } = storeToRefs(stretchStore)
+const { stretches, isLoading, error } = storeToRefs(stretchStore)
 
 const isCreatingWorkout = ref(false)
 const isSidebarActive = ref(false)
@@ -37,28 +37,68 @@ type PresetWorkout = {
   stretchIds: number[]
 }
 
-const presetWorkouts: PresetWorkout[] = [
-  {
-    key: 'upper',
-    title: 'Upper Body Preset',
-    stretchIds: [4, 5, 6, 7],
-  },
-  {
-    key: 'lower',
-    title: 'Lower Body Preset',
-    stretchIds: [12, 14, 16, 18],
-  },
-  {
-    key: 'full-body',
-    title: 'Full Body Preset',
-    stretchIds: [19, 20, 21],
-  },
-  {
-    key: 'arms',
-    title: 'Arms Preset',
-    stretchIds: [1, 2, 3],
-  },
-]
+const presetWorkouts = computed<PresetWorkout[]>(function () {
+  const upperStretchIds = stretches.value
+    .filter(function (stretch) {
+      return stretch.category === 'Upper Body'
+    })
+    .slice(0, 4)
+    .map(function (stretch) {
+      return stretch.id
+    })
+
+  const lowerStretchIds = stretches.value
+    .filter(function (stretch) {
+      return stretch.category === 'Lower Body'
+    })
+    .slice(0, 4)
+    .map(function (stretch) {
+      return stretch.id
+    })
+
+  const fullBodyStretchIds = stretches.value
+    .filter(function (stretch) {
+      return stretch.category === 'Full Body'
+    })
+    .slice(0, 3)
+    .map(function (stretch) {
+      return stretch.id
+    })
+
+  const armsStretchIds = stretches.value
+    .filter(function (stretch) {
+      return stretch.targetMuscles.some(function (muscle) {
+        return muscle.toLowerCase() === 'arms'
+      })
+    })
+    .slice(0, 3)
+    .map(function (stretch) {
+      return stretch.id
+    })
+
+  return [
+    {
+      key: 'upper',
+      title: 'Upper Body Preset',
+      stretchIds: upperStretchIds,
+    },
+    {
+      key: 'lower',
+      title: 'Lower Body Preset',
+      stretchIds: lowerStretchIds,
+    },
+    {
+      key: 'full-body',
+      title: 'Full Body Preset',
+      stretchIds: fullBodyStretchIds,
+    },
+    {
+      key: 'arms',
+      title: 'Arms Preset',
+      stretchIds: armsStretchIds,
+    },
+  ]
+})
 
 const presetTimeByKey = ref<Record<PresetWorkout['key'], number | null>>({
   upper: null,
@@ -128,6 +168,11 @@ function publishWorkout() {
 
 function publishPresetWorkout(preset: PresetWorkout) {
   if (!currentUser.value) return
+
+  if (preset.stretchIds.length === 0) {
+    presetErrorMessage.value = `${preset.title} currently has no mapped stretches.`
+    return
+  }
 
   const timeMinutes = presetTimeByKey.value[preset.key]
 
@@ -259,6 +304,11 @@ function presetStretchNames(stretchIds: number[]) {
           </button>
 
           <div v-if="showStretchCatalog" class="catalog-dropdown mt-3">
+            <div v-if="isLoading" class="catalog-item">Loading stretches...</div>
+            <div v-else-if="error" class="catalog-item has-text-danger">{{ error }}</div>
+            <div v-else-if="stretches.length === 0" class="catalog-item has-text-grey">
+              No stretches were returned by the server.
+            </div>
             <div v-for="stretch in stretches" :key="`catalog-${stretch.id}`" class="catalog-item">
               <strong class="catalog-name">{{ stretch.name }}</strong>
               <p class="catalog-meta has-text-grey">

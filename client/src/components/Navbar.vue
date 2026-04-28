@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import type { User } from '../stores/types'
 
@@ -10,6 +10,23 @@ const { loginAs, logout } = authStore
 
 const showLoginMenu = ref(false)
 const showMobileMenu = ref(false)
+
+const userInitials = computed(function () {
+  if (!currentUser.value) {
+    return ''
+  }
+
+  return currentUser.value.name
+    .split(' ')
+    .filter(function (part) {
+      return part.length > 0
+    })
+    .slice(0, 2)
+    .map(function (part) {
+      return part[0].toUpperCase()
+    })
+    .join('')
+})
 
 function closeMenus() {
   showMobileMenu.value = false
@@ -51,16 +68,30 @@ function handleLogout() {
 
       <div class="navbar-menu" :class="{ 'is-active': showMobileMenu }">
         <div class="navbar-start">
-          <RouterLink to="/" class="navbar-item nav-link" @click="closeMenus">Home</RouterLink>
-          <RouterLink to="/profile" class="navbar-item nav-link" @click="closeMenus">Profile</RouterLink>
-          <RouterLink to="/workouts" class="navbar-item nav-link" @click="closeMenus">Workouts</RouterLink>
-          <RouterLink v-if="isAdmin" to="/admin" class="navbar-item nav-link" @click="closeMenus">Admin</RouterLink>
+          <RouterLink to="/" active-class="is-active" class="navbar-item nav-link" @click="closeMenus">Home</RouterLink>
+          <RouterLink to="/profile" active-class="is-active" class="navbar-item nav-link" @click="closeMenus">Profile</RouterLink>
+          <RouterLink to="/workouts" active-class="is-active" class="navbar-item nav-link" @click="closeMenus">Workouts</RouterLink>
+          <div v-if="isAdmin" class="navbar-item has-dropdown is-hoverable nav-admin-dropdown">
+            <span class="navbar-link nav-link nav-admin-link">Admin</span>
+            <div class="navbar-dropdown is-right">
+              <RouterLink to="/admin" active-class="is-active" class="navbar-item" @click="closeMenus">
+                Dashboard
+              </RouterLink>
+              <RouterLink to="/workouts" active-class="is-active" class="navbar-item" @click="closeMenus">
+                Manage Workouts
+              </RouterLink>
+            </div>
+          </div>
           <span v-else class="navbar-item nav-link is-disabled" aria-disabled="true">Admin</span>
         </div>
 
         <div class="navbar-end is-align-items-center">
-          <div v-if="currentUser" class="navbar-item has-text-white user-label">
-            {{ currentUser.name }} ({{ currentUser.role }})
+          <div v-if="currentUser" class="navbar-item has-text-white user-chip">
+            <span class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
+            <div class="user-meta">
+              <span class="user-name">{{ currentUser.name }}</span>
+              <span class="user-role">{{ currentUser.role }}</span>
+            </div>
           </div>
 
           <div class="navbar-item" v-if="!currentUser">
@@ -137,10 +168,58 @@ function handleLogout() {
   color: #ffffff;
 }
 
+.nav-link.is-active,
 .router-link-active.nav-link {
   background-color: #c56a00;
   box-shadow: inset 0 -3px 0 #fff1de;
   color: #ffffff;
+}
+
+.nav-admin-dropdown .navbar-dropdown {
+  border-top: 0;
+}
+
+.nav-admin-link {
+  color: #f7f9ff;
+  min-height: 4.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #fff1de;
+  color: #8e4f00;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.user-role {
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  opacity: 0.9;
 }
 
 .is-disabled {
@@ -159,6 +238,12 @@ function handleLogout() {
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.2;
+}
+
+.nav-admin-dropdown .navbar-item.is-active,
+.nav-admin-dropdown .router-link-active {
+  background-color: rgba(197, 106, 0, 0.14);
+  font-weight: 700;
 }
 
 .nav-account-button {

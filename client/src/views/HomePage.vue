@@ -38,6 +38,7 @@ const activityWorkouts = computed(function () {
     .sort(function (a, b) {
       return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     })
+    .slice(0, 2)
 })
 
 function userNameById(userId: number) {

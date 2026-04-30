@@ -8,6 +8,12 @@ type DataListEnvelope<T> = {
 	message?: string
 }
 
+type DataEnvelope<T> = {
+	data: T
+	isSuccess: boolean
+	message?: string
+}
+
 type GetWorkoutsOptions = {
 	page?: number
 	pageSize?: number
@@ -33,4 +39,8 @@ export function getWorkouts(options: GetWorkoutsOptions = {}) {
 	const endpoint = query ? `/workouts?${query}` : '/workouts'
 
 	return api<DataListEnvelope<Workout>>(endpoint)
+}
+
+export function deleteWorkout(id: number) {
+	return api<DataEnvelope<Workout>>(`/workouts/${id}`, undefined, { method: 'DELETE' })
 }

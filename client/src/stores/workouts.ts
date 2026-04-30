@@ -2,17 +2,10 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Workout } from './types'
 import { api } from '../services/myFetch'
-import { getWorkouts } from '../services/workouts'
+import { deleteWorkout as deleteWorkoutRequest, getWorkouts } from '../services/workouts'
 
 export const useWorkoutStore = defineStore('workout', function () {
   const workouts = ref<Workout[]>([])
-
-  const nextWorkoutId = computed(function () {
-    if (workouts.value.length === 0) return 1
-    return Math.max(...workouts.value.map(function (workout) {
-      return workout.id
-    })) + 1
-  })
 
   const isLoading = ref(false)
   const error = ref('')
@@ -38,32 +31,24 @@ export const useWorkoutStore = defineStore('workout', function () {
     workoutTimeMinutes: number
     stretchIds: number[]
   }) {
-    // send to server for persistence
-    try {
-      const payload = {
-        userId: workoutstorage.userId,
-        title: workoutstorage.title,
-        workoutTimeMinutes: workoutstorage.workoutTimeMinutes,
-        stretchIds: workoutstorage.stretchIds,
-      }
-
-      const created = await api<Workout>('/workouts', payload, { method: 'POST' })
-
-      // server returns the created workout with id and publishedAt
-      workouts.value.unshift(created)
-    } catch (err) {
-      // fallback to local-only if server fails
-      const workout: Workout = {
-        id: nextWorkoutId.value,
-        userId: workoutstorage.userId,
-        title: workoutstorage.title,
-        workoutTimeMinutes: workoutstorage.workoutTimeMinutes,
-        stretchIds: workoutstorage.stretchIds,
-        publishedAt: new Date().toISOString(),
-      }
-
-      workouts.value.unshift(workout)
+    const payload = {
+      userId: workoutstorage.userId,
+      title: workoutstorage.title,
+      workoutTimeMinutes: workoutstorage.workoutTimeMinutes,
+      stretchIds: workoutstorage.stretchIds,
     }
+
+    const created = await api<Workout>('/workouts', payload, { method: 'POST' })
+
+    // server returns the created workout with id and publishedAt
+    workouts.value.unshift(created)
+  }
+
+  async function deleteWorkout(id: number) {
+    await deleteWorkoutRequest(id)
+    workouts.value = workouts.value.filter(function (workout) {
+      return workout.id !== id
+    })
   }
 
   function workoutsByUser(userId: number) {
@@ -78,6 +63,7 @@ export const useWorkoutStore = defineStore('workout', function () {
     error,
     loadWorkouts,
     publishWorkout,
+    deleteWorkout,
     workoutsByUser,
   }
 })

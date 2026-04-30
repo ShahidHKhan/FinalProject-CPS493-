@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
 import { useWorkoutStore } from '../stores/workouts'
 import Sidebar from '../components/Sidebar.vue'
+import type { Workout } from '../stores/types'
 
 const authStore = useAuthStore()
 const stretchStore = useStretchStore()
@@ -29,6 +30,7 @@ const title = ref('')
 const workoutTimeMinutes = ref<number | null>(null)
 const selectedStretchIds = ref<number[]>([])
 const errorMessage = ref('')
+const deleteWorkoutError = ref('')
 const presetErrorMessage = ref('')
 
 function toggleSidebar() {
@@ -150,6 +152,8 @@ function cancelCreate() {
 async function publishWorkout() {
   if (!currentUser.value) return
 
+  errorMessage.value = ''
+
   const trimmedTitle = title.value.trim()
 
   if (!trimmedTitle) {
@@ -167,12 +171,17 @@ async function publishWorkout() {
     return
   }
 
-  await workoutStore.publishWorkout({
-    userId: currentUser.value.id,
-    title: trimmedTitle,
-    workoutTimeMinutes: workoutTimeMinutes.value,
-    stretchIds: selectedStretchIds.value,
-  })
+  try {
+    await workoutStore.publishWorkout({
+      userId: currentUser.value.id,
+      title: trimmedTitle,
+      workoutTimeMinutes: workoutTimeMinutes.value,
+      stretchIds: selectedStretchIds.value,
+    })
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Could not publish the workout.'
+    return
+  }
 
   isCreatingWorkout.value = false
   resetForm()
@@ -180,6 +189,8 @@ async function publishWorkout() {
 
 async function publishPresetWorkout(preset: PresetWorkout) {
   if (!currentUser.value) return
+
+  presetErrorMessage.value = ''
 
   if (preset.stretchIds.length === 0) {
     presetErrorMessage.value = `${preset.title} currently has no mapped stretches.`
@@ -193,15 +204,34 @@ async function publishPresetWorkout(preset: PresetWorkout) {
     return
   }
 
-  await workoutStore.publishWorkout({
-    userId: currentUser.value.id,
-    title: preset.title,
-    workoutTimeMinutes: timeMinutes,
-    stretchIds: preset.stretchIds,
-  })
+  try {
+    await workoutStore.publishWorkout({
+      userId: currentUser.value.id,
+      title: preset.title,
+      workoutTimeMinutes: timeMinutes,
+      stretchIds: preset.stretchIds,
+    })
+  } catch (error) {
+    presetErrorMessage.value = error instanceof Error ? error.message : 'Could not publish the preset workout.'
+    return
+  }
 
   presetTimeByKey.value[preset.key] = null
   presetErrorMessage.value = ''
+}
+
+async function confirmDeleteWorkout(workout: Workout) {
+  deleteWorkoutError.value = ''
+
+  if (!window.confirm('confirm delete?')) {
+    return
+  }
+
+  try {
+    await workoutStore.deleteWorkout(workout.id)
+  } catch {
+    deleteWorkoutError.value = 'Could not delete this workout. Please try again.'
+  }
 }
 
 function stretchNameById(stretchId: number) {
@@ -254,6 +284,10 @@ watch(currentUser, function () {
         <div class="box mb-5">
           <h2 class="title is-5 mb-3 heading-emphasis">Your Saved Workouts</h2>
 
+          <div v-if="deleteWorkoutError" class="notification is-danger is-light py-3">
+            {{ deleteWorkoutError }}
+          </div>
+
           <div v-if="isLoadingWorkouts" class="notification is-info is-light py-3">
             Loading workouts...
           </div>
@@ -266,7 +300,16 @@ watch(currentUser, function () {
 
           <div v-else class="workout-list">
             <article v-for="workout in currentUserWorkouts" :key="workout.id" class="box workout-card">
-              <h3 class="title is-6 mb-2 heading-emphasis">{{ workout.title }}</h3>
+              <div class="workout-card-header mb-2">
+                <h3 class="title is-6 mb-0 heading-emphasis">{{ workout.title }}</h3>
+                <button
+                  class="button is-danger is-small workout-delete-button"
+                  type="button"
+                  @click="confirmDeleteWorkout(workout)"
+                >
+                  Delete
+                </button>
+              </div>
               <p class="mb-1 data-line"><strong>Time:</strong> {{ workout.workoutTimeMinutes }} minutes</p>
               <p class="mb-1 data-line"><strong>Stretches:</strong> {{ workout.stretchIds.length }}</p>
               <p class="meta-text">Published: {{ workout.publishedAt }}</p>
@@ -500,6 +543,17 @@ watch(currentUser, function () {
 
 .workout-card {
   margin-bottom: 0;
+}
+
+.workout-card-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.workout-delete-button {
+  flex-shrink: 0;
 }
 
 .catalog-dropdown {

@@ -1,6 +1,7 @@
 import { config } from 'dotenv'
 config()
 
+import { fileURLToPath } from 'url'
 import { seed as seedUsers } from './users'
 import { seed as seedStretches } from './stretches'
 import { seed as seedPresets } from './workoutPresets'
@@ -22,7 +23,8 @@ async function run() {
   }
 }
 
-if (require.main === module) {
+const isMain = import.meta.url === `file://${process.argv[1]}`
+if (isMain) {
   void run()
 }
 

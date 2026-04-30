@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
 import { useWorkoutStore } from '../stores/workouts'
+import BodySchematic from '../components/BodySchematic.vue'
 
 const authStore = useAuthStore()
 const stretchStore = useStretchStore()
@@ -24,10 +25,18 @@ const muscleGroupOptions = [
   'Quadriceps',
   'Hamstrings',
   'Calves',
-  'Full-Body',
 ] as const
 
 const selectedHealingMuscles = ref<string[]>([])
+
+function toggleMuscle(muscle: string) {
+  const index = selectedHealingMuscles.value.indexOf(muscle)
+  if (index > -1) {
+    selectedHealingMuscles.value.splice(index, 1)
+  } else {
+    selectedHealingMuscles.value.push(muscle)
+  }
+}
 
 const friendsList = computed(function () {
   if (!currentUser.value) return []
@@ -35,33 +44,6 @@ const friendsList = computed(function () {
     return account.id !== currentUser.value!.id
   })
 })
-
-const userWorkouts = computed(function () {
-  if (!currentUser.value) return []
-  return workoutStore.workoutsByUser(currentUser.value.id)
-})
-
-function stretchNameById(stretchId: number) {
-  const matchingStretch = stretches.value.find(function (stretch) {
-    return stretch.id === stretchId
-  })
-
-  if (matchingStretch === undefined || matchingStretch === null) {
-    return 'Unknown Stretch'
-  }
-
-  return matchingStretch.name
-}
-
-function formatPublishedDate(isoDate: string) {
-  return new Date(isoDate).toLocaleString()
-}
-
-function stretchNamesByIds(stretchIds: number[]) {
-  return stretchIds.map(function (stretchId) {
-    return stretchNameById(stretchId)
-  }).join(', ')
-}
 </script>
 
 <template>
@@ -76,28 +58,7 @@ function stretchNamesByIds(stretchIds: number[]) {
         <p class="mb-5">Workout activity for {{ currentUser.name }}.</p>
 
         <div class="columns is-variable is-6 profile-layout">
-          <div class="column is-two-thirds">
-            <h2 class="title is-4 heading-emphasis">Published Workouts</h2>
-
-            <div v-if="userWorkouts.length === 0" class="notification is-info is-light">
-              No workouts published yet. Go to Workouts to create and publish one.
-            </div>
-
-            <div v-else class="content">
-              <div v-for="workout in userWorkouts" :key="workout.id" class="box mb-4 published-workout-card">
-                <h3 class="title is-5 heading-emphasis">{{ workout.title }}</h3>
-                <p class="data-line">
-                  <strong>Time Workout:</strong> {{ workout.workoutTimeMinutes }} minutes |
-                  <strong>Published:</strong> {{ formatPublishedDate(workout.publishedAt) }}
-                </p>
-                <p class="meta-text">
-                  <strong>Stretches:</strong>
-                  {{ stretchNamesByIds(workout.stretchIds) }}
-                </p>
-              </div>
-            </div>
-          </div>
-
+          <!-- Left Column: Friends List -->
           <div class="column is-one-third">
             <h2 class="title is-4">Friends List</h2>
 
@@ -115,34 +76,34 @@ function stretchNamesByIds(stretchIds: number[]) {
               </ul>
             </div>
 
-            <h2 class="title is-4">Recovery Focus</h2>
-            <div class="box">
-              <p class="mb-3">
-                <strong>Muscles currently trying to heal / stretch:</strong>
-              </p>
+            <h2 class="title is-4 heading-emphasis mt-6">Select muscles for focus</h2>
 
-              <div class="muscle-options mb-4">
-                <label
+            <div class="muscle-selection-box">
+              <div class="muscle-pills">
+                <button
                   v-for="muscleGroup in muscleGroupOptions"
                   :key="muscleGroup"
-                  class="muscle-option"
-                >
-                  <input v-model="selectedHealingMuscles" type="checkbox" :value="muscleGroup">
-                  <span>{{ muscleGroup }}</span>
-                </label>
-              </div>
-
-              <div v-if="selectedHealingMuscles.length > 0" class="selected-tags">
-                <span
-                  v-for="muscleGroup in selectedHealingMuscles"
-                  :key="muscleGroup"
-                  class="tag is-info is-light mr-2 mb-2"
+                  @click="toggleMuscle(muscleGroup)"
+                  :class="['pill-button', { 'pill-button-active': selectedHealingMuscles.includes(muscleGroup) }]"
                 >
                   {{ muscleGroup }}
-                </span>
+                </button>
               </div>
+            </div>
+          </div>
 
-              <p v-else class="has-text-grey is-size-7">No muscle groups selected yet.</p>
+          <!-- Right Column: Recovery Focus + Body Schematic -->
+          <div class="column is-two-thirds">
+            <h2 class="title is-4 heading-emphasis">Recovery Focus</h2>
+
+            <div class="recovery-focus-box">
+              <!-- Body Schematic -->
+              <div class="body-schematic-wrapper">
+                <BodySchematic
+                  :active-muscles="selectedHealingMuscles"
+                  @toggle-muscle="toggleMuscle"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -167,57 +128,92 @@ function stretchNamesByIds(stretchIds: number[]) {
   justify-content: space-between;
 }
 
-.muscle-options {
+.recovery-focus-box {
+  background: #f8fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.muscle-selection-box {
+  background: #f8fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.muscle-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
 }
 
-.muscle-option {
-  align-items: center;
-  background: #edf5ef;
-  border: 1px solid #bfd4c7;
+.pill-button {
+  background-color: #e5e7eb;
+  border: 2px solid #d1d5db;
   border-radius: 999px;
-  color: var(--text-heading);
+  color: var(--text-heading, #333);
   cursor: pointer;
-  display: inline-flex;
   font-size: 0.95rem;
-  font-weight: 700;
-  gap: 0.45rem;
-  line-height: 1.2;
-  padding: 0.6rem 0.95rem;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
   transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
-.muscle-option:hover {
-  transform: translateY(-1px);
+.pill-button:hover {
+  background-color: #d1d5db;
+  border-color: #9ca3af;
+  transform: translateY(-2px);
 }
 
-.muscle-option input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
+.pill-button-active {
+  background-color: #60a5fa;
+  border-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-.muscle-option span {
-  display: inline-flex;
-  align-items: center;
+.pill-button-active:hover {
+  background-color: #3b82f6;
+  border-color: #1d4ed8;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
-.muscle-option:has(input:checked) {
-  background: linear-gradient(135deg, var(--brand-primary) 0%, #147557 100%);
-  border-color: var(--brand-primary-dark);
-  box-shadow: 0 10px 20px rgba(13, 90, 66, 0.2);
-  color: #ffffff;
+.body-schematic-wrapper {
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .selected-tags {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    flex-direction: column;
+  }
+
+  .column {
+    width: 100% !important;
+  }
+
+  .muscle-pills {
+    gap: 0.5rem;
+  }
+
+  .pill-button {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
 }
 </style>

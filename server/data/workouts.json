@@ -1,14 +1,20 @@
 [
   {
+    "userId": 1,
+    "title": "Shahid's Full Body",
+    "workoutTimeMinutes": 40,
+    "stretches": ["Overhead Triceps Stretch", "Cross-Body Arm Stretch", "Shoulder Wall Slides", "Figure Four Stretch", "Standing Quad Stretch", "Seated Hamstring Reach"]
+  },
+  {
     "userId": 2,
-    "title": "Bob's Morning",
-    "workoutTimeMinutes": 15,
-    "stretches": ["Cat-Cow Flow", "Child's Pose Reach", "Seated Spinal Twist"]
+    "title": "Josh's Upper Body",
+    "workoutTimeMinutes": 30,
+    "stretches": ["Overhead Triceps Stretch", "Cross-Body Arm Stretch", "Doorway Chest Opener", "Shoulder Wall Slides"]
   },
   {
     "userId": 3,
-    "title": "Charlie's Quick Warmup",
-    "workoutTimeMinutes": 10,
-    "stretches": ["Overhead Triceps Stretch", "Doorway Chest Opener", "World's Greatest Stretch"]
+    "title": "Michael's Lower Body",
+    "workoutTimeMinutes": 35,
+    "stretches": ["Figure Four Stretch", "Kneeling Glute Stretch", "Standing Quad Stretch", "Seated Hamstring Reach"]
   }
 ]

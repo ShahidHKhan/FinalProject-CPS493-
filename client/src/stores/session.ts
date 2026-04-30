@@ -1,8 +1,46 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defineStore } from 'pinia'
-import type { DataEnvelope, user as User } from '../../../server/types'
+import type { DataEnvelope } from '../../../server/types'
 import { computed, ref } from 'vue'
 
-import { api as myApi } from '../services/myFetch'
+import { api as myApi, loadScript } from '../services/myFetch'
+
+type SessionUser = {
+	firstName: string
+	lastName: string
+	email: string
+	image: string
+	name: string
+	role?: string
+}
+
+type GoogleTokenResponse = {
+	access_token?: string
+	error?: string
+}
+
+type GoogleUserInfo = {
+	given_name?: string
+	family_name?: string
+	email?: string
+	picture?: string
+}
+
+type GoogleAccountsOauth2 = {
+	initTokenClient: (config: {
+		client_id: string
+		scope: string
+		callback: (response: GoogleTokenResponse) => void | Promise<void>
+	}) => {
+		requestAccessToken: () => void
+	}
+}
+
+type GoogleApi = {
+	accounts?: {
+		oauth2?: GoogleAccountsOauth2
+	}
+}
 
 export type FeedbackMessage = {
 	type: 'success' | 'danger' | 'info'
@@ -10,19 +48,90 @@ export type FeedbackMessage = {
 }
 
 export const useSessionStore = defineStore('session', () => {
-	const user = ref<User | null>(null)
+	const user = ref<SessionUser | null>(null)
 	const token = ref<string | null>(null)
 
-	async function login(email: string, password: string) {
-		const response = await myApi<DataEnvelope<{ user: User; token: string }>>(
-			'users/login',
-			{ email, password },
-			{ method: 'POST' },
-		)
-		if (!response.isSuccess) {
-			addMessage(response.message || 'Login failed', 'danger')
+	async function login() {
+		await loadScript('https://accounts.google.com/gsi/client', 'google-signin')
+
+		const google = (window as Window & { google?: GoogleApi }).google
+		const tokenClient = google?.accounts?.oauth2?.initTokenClient
+
+		if (!tokenClient) {
+			throw new Error('Google OAuth client is unavailable.')
+		}
+
+		const client = tokenClient({
+			client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+			scope: 'email profile https://www.googleapis.com/auth/calendar.events.readonly',
+			callback: async (response) => {
+				if (response.error) {
+					throw new Error(response.error)
+				}
+
+				if (!response.access_token) {
+					throw new Error('Google did not return an access token.')
+				}
+
+				await setUser(response.access_token)
+				await getCalendarEvents(response.access_token)
+			},
+		})
+
+		client.requestAccessToken()
+	}
+
+	async function setUser(accessToken: string) {
+		const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		})
+
+		if (!response.ok) {
+			throw new Error('Unable to load Google profile information.')
+		}
+
+		const data: GoogleUserInfo = await response.json()
+		const firstName = data.given_name ?? ''
+		const lastName = data.family_name ?? ''
+		const name = `${firstName} ${lastName}`.trim()
+
+		user.value = {
+			firstName,
+			lastName,
+			email: data.email ?? '',
+			image: data.picture ?? '',
+			name: name || data.email || 'Signed in user',
+		}
+	}
+
+	async function getCalendarEvents(googleToken: string) {
+		const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+			headers: {
+				Authorization: `Bearer ${googleToken}`,
+			},
+		})
+
+		if (!response.ok) {
 			return
 		}
+
+		const data = await response.json()
+		console.log({ calendarEvents: data })
+	}
+
+	async function exchangeForOurToken(googleToken: string) {
+		const response = await myApi<DataEnvelope<{ user: SessionUser; token: string }>>(
+			'users/login',
+			{ googleToken },
+			{ method: 'POST' },
+		)
+
+		if (!response.isSuccess) {
+			throw new Error(response.message || 'Login failed')
+		}
+
 		const { user: loggedInUser, token: authToken } = response.data
 		user.value = loggedInUser
 		token.value = authToken
@@ -74,5 +183,8 @@ export const useSessionStore = defineStore('session', () => {
 		handleError,
 		isLoading,
 		api,
+		setUser,
+		getCalendarEvents,
+		exchangeForOurToken,
 	}
 })

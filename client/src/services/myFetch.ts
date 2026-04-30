@@ -41,3 +41,23 @@ export function api<T>(
   const path = endpoint.replace(/^\/+/, '')
   return rest<T>(`${base}/${path}`, data, options)
 }
+
+export function loadScript(src: string, id?: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (id && document.getElementById(id)) {
+      resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = src
+
+    if (id) {
+      script.id = id
+    }
+
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`))
+    document.body.appendChild(script)
+  })
+}

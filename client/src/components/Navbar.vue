@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
-import type { User } from '../stores/types'
+import { storeToRefs } from 'pinia'
+import { useSessionStore } from '../stores/session'
 
-const authStore = useAuthStore()
-const { availableAccounts, currentUser, isAdmin, isLoadingAccounts, accountLoadError } = storeToRefs(authStore)
-const { loginAs, logout } = authStore
+const sessionStore = useSessionStore()
+const { user } = storeToRefs(sessionStore)
+const { login, logout } = sessionStore
 
-const showLoginMenu = ref(false)
 const showMobileMenu = ref(false)
+const isAdmin = computed(function () {
+  return user.value?.role === 'admin'
+})
 
 const userInitials = computed(function () {
-  if (!currentUser.value) {
+  if (!user.value) {
     return ''
   }
 
-  return currentUser.value.name
+  return user.value.name
     .split(' ')
     .filter(function (part) {
       return part.length > 0
@@ -30,16 +31,15 @@ const userInitials = computed(function () {
 
 function closeMenus() {
   showMobileMenu.value = false
-  showLoginMenu.value = false
 }
 
 function toggleMobileMenu() {
   showMobileMenu.value = !showMobileMenu.value
 }
 
-function handleLogin(user: User) {
-  loginAs(user)
+async function handleLogin() {
   closeMenus()
+  await login()
 }
 
 function handleLogout() {
@@ -86,53 +86,29 @@ function handleLogout() {
         </div>
 
         <div class="navbar-end is-align-items-center">
-          <div v-if="currentUser" class="navbar-item has-text-white user-chip">
-            <span class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
+          <div v-if="user" class="navbar-item has-text-white user-chip">
+            <img
+              v-if="user.image"
+              :src="user.image"
+              alt="Profile Picture"
+              class="user-avatar"
+              width="30"
+              height="30"
+            />
+            <span v-else class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
             <div class="user-meta">
-              <span class="user-name">{{ currentUser.name }}</span>
-              <span class="user-role">{{ currentUser.role }}</span>
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-role">{{ user.email }}</span>
             </div>
-          </div>
-
-          <div class="navbar-item" v-if="!currentUser">
-            <div class="dropdown is-right" :class="{ 'is-active': showLoginMenu }">
-              <div class="dropdown-trigger">
-                <button
-                  class="button is-light nav-account-button"
-                  aria-haspopup="true"
-                  aria-controls="login-menu"
-                  @click="showLoginMenu = !showLoginMenu"
-                >
-                  <span>Log in</span>
-                </button>
-              </div>
-
-              <div id="login-menu" class="dropdown-menu" role="menu">
-                <div class="dropdown-content">
-                  <div v-if="isLoadingAccounts" class="dropdown-item is-size-7 has-text-grey">
-                    Loading accounts...
-                  </div>
-                  <div v-else-if="accountLoadError" class="dropdown-item is-size-7 has-text-danger">
-                    {{ accountLoadError }}
-                  </div>
-                  <div v-else-if="availableAccounts.length === 0" class="dropdown-item is-size-7 has-text-grey">
-                    No accounts found.
-                  </div>
-                  <button
-                    v-for="account in availableAccounts"
-                    :key="account.id"
-                    class="dropdown-item profile-option"
-                    @click="handleLogin(account)"
-                  >
-                    {{ account.name }}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="navbar-item" v-else>
             <button class="button is-danger is-light nav-account-button" @click="handleLogout">Log out</button>
+          </div>
+
+          <div v-else class="navbar-item">
+            <div class="buttons">
+              <button class="button is-light nav-account-button" @click="handleLogin">
+                Log in
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -225,6 +201,7 @@ function handleLogout() {
   font-weight: 800;
   box-shadow: 0 4px 12px rgba(10, 28, 53, 0.12);
   border: 1px solid rgba(13, 90, 66, 0.06);
+  object-fit: cover;
 }
 
 .user-meta {
@@ -248,13 +225,6 @@ function handleLogout() {
 .is-disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-.profile-option {
-  width: 100%;
-  text-align: left;
-  border: 0;
-  background: transparent;
 }
 
 .user-label {

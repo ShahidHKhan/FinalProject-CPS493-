@@ -20,6 +20,12 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@types/google.accounts": "^0.0.18",
+    "@types/gapi": "^0.0.47",
+    "@types/gapi.client.calendar-v3": "^0.0.4",
+    "@types/gapi.client.drive-v3": "^0.0.5",
+    "@types/gapi.client.gmail-v1": "^0.0.4",
+    "@types/gapi.client.oauth2-v2": "^0.0.4",
     "@eslint/js": "^9.22.0",
     "@vitejs/plugin-vue": "^6.0.2",
     "eslint": "^9.22.0",

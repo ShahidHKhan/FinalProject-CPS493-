@@ -28,11 +28,14 @@ body {
   font-size: 1.05rem;
   line-height: 1.55;
   color: var(--text-body);
+  /* Site background: place the background image at `client/public/background.jpg` */
   background-color: var(--surface-base);
   background-image:
-    radial-gradient(circle at 15% 12%, rgba(163, 192, 101, 0.28), transparent 36%),
-    radial-gradient(circle at 85% 20%, rgba(13, 90, 66, 0.2), transparent 34%),
-    linear-gradient(180deg, #eef4ef 0%, #f9fafb 42%, #f4f8f6 100%);
+    linear-gradient(rgba(10,28,53,0.18), rgba(10,28,53,0.18)),
+    url('/background.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   background-attachment: fixed;
 }
 
@@ -51,10 +54,11 @@ main {
 }
 
 .section .container {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(232, 242, 238, 0.86) 100%);
-  border: 1px solid #d5e2db;
-  border-radius: 16px;
-  box-shadow: 0 14px 30px rgba(10, 28, 53, 0.08);
+  /* Make containers transparent so the full-bleed background image is visible */
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: none;
   padding: clamp(1rem, 2.4vw, 1.8rem);
 }
 

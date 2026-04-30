@@ -234,14 +234,14 @@ watch(currentUser, function () {
 <template>
   <section class="section">
     <button
-      class="sidebar-toggle"
+      :class="['sidebar-toggle', { 'is-open': isSidebarActive }]"
       type="button"
       :aria-expanded="isSidebarActive"
       :aria-label="isSidebarActive ? 'Close preset workouts sidebar' : 'Open preset workouts sidebar'"
       :style="{ right: isSidebarActive ? `${sidebarWidth + 16}px` : '16px' }"
       @click="toggleSidebar"
     >
-      {{ isSidebarActive ? 'Close Presets' : 'Open Presets' }}
+      <span class="sidebar-label">Presets</span>
     </button>
     <div class="container">
       <div v-if="!currentUser" class="notification is-warning is-light">
@@ -426,11 +426,23 @@ watch(currentUser, function () {
   min-width: 11rem;
   padding: 0.75rem 1rem;
   transition: right 0.3s ease-in-out, background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0% 0%, calc(100% - 18px) 0%, 100% 50%, calc(100% - 18px) 100%, 0% 100%);
 }
 
 .sidebar-toggle:hover {
   background-color: #0a3a2b;
   transform: translateY(calc(-50% - 1px));
+}
+
+.sidebar-toggle .sidebar-label {
+  pointer-events: none;
+}
+
+.sidebar-toggle.is-open {
+  clip-path: polygon(18px 0%, 100% 0%, 100% 100%, 18px 100%, 0% 50%);
 }
 
 .sidebar-content {

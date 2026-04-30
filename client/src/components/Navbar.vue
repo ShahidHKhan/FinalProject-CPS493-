@@ -216,13 +216,15 @@ function handleLogout() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  background: var(--brand-lime);
-  color: var(--brand-midnight);
-  font-size: 0.8rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  font-size: 0.88rem;
   font-weight: 800;
+  box-shadow: 0 4px 12px rgba(10, 28, 53, 0.12);
+  border: 1px solid rgba(13, 90, 66, 0.06);
 }
 
 .user-meta {

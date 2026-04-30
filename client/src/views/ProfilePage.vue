@@ -84,7 +84,7 @@ function stretchNamesByIds(stretchIds: number[]) {
             </div>
 
             <div v-else class="content">
-              <div v-for="workout in userWorkouts" :key="workout.id" class="box mb-4">
+              <div v-for="workout in userWorkouts" :key="workout.id" class="box mb-4 published-workout-card">
                 <h3 class="title is-5 heading-emphasis">{{ workout.title }}</h3>
                 <p class="data-line">
                   <strong>Time Workout:</strong> {{ workout.workoutTimeMinutes }} minutes |
@@ -125,7 +125,7 @@ function stretchNamesByIds(stretchIds: number[]) {
                 <label
                   v-for="muscleGroup in muscleGroupOptions"
                   :key="muscleGroup"
-                  class="checkbox muscle-option"
+                  class="muscle-option"
                 >
                   <input v-model="selectedHealingMuscles" type="checkbox" :value="muscleGroup">
                   <span>{{ muscleGroup }}</span>
@@ -156,6 +156,11 @@ function stretchNamesByIds(stretchIds: number[]) {
   align-items: flex-start;
 }
 
+.published-workout-card {
+  max-width: 44rem;
+  width: 100%;
+}
+
 .friend-item {
   align-items: center;
   display: flex;
@@ -163,14 +168,52 @@ function stretchNamesByIds(stretchIds: number[]) {
 }
 
 .muscle-options {
-  display: grid;
-  gap: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .muscle-option {
   align-items: center;
-  display: flex;
-  gap: 0.5rem;
+  background: #edf5ef;
+  border: 1px solid #bfd4c7;
+  border-radius: 999px;
+  color: var(--text-heading);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  gap: 0.45rem;
+  line-height: 1.2;
+  padding: 0.6rem 0.95rem;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.muscle-option:hover {
+  transform: translateY(-1px);
+}
+
+.muscle-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.muscle-option span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.muscle-option:has(input:checked) {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #147557 100%);
+  border-color: var(--brand-primary-dark);
+  box-shadow: 0 10px 20px rgba(13, 90, 66, 0.2);
+  color: #ffffff;
 }
 
 .selected-tags {

@@ -12,6 +12,19 @@ const workoutStore = useWorkoutStore()
 const { currentUser, availableAccounts } = storeToRefs(authStore)
 const { stretches } = storeToRefs(stretchStore)
 
+function initialsFromName(name: string) {
+  return name
+    .split(' ')
+    .filter(function (part) {
+      return part.length > 0
+    })
+    .slice(0, 2)
+    .map(function (part) {
+      return part[0].toUpperCase()
+    })
+    .join('')
+}
+
 const mostRecentWorkout = computed(function () {
   if (!currentUser.value) return null
 
@@ -51,6 +64,24 @@ function userNameById(userId: number) {
   }
 
   return matchingAccount.name
+}
+
+function userInitialsById(userId: number) {
+  const matchingAccount = availableAccounts.value.find(function (account) {
+    return account.id === userId
+  })
+
+  if (matchingAccount === undefined || matchingAccount === null) {
+    return '??'
+  }
+
+  return initialsFromName(matchingAccount.name)
+}
+
+function activityAvatarClass(userId: number) {
+  const palette = ['avatar-tone-a', 'avatar-tone-b', 'avatar-tone-c', 'avatar-tone-d']
+
+  return palette[userId % palette.length]
 }
 
 function stretchNameById(stretchId: number) {
@@ -94,7 +125,7 @@ function stretchNamesByIds(stretchIds: number[]) {
           </span>
         </p>
 
-        <div v-if="currentUser.role === 'admin'" class="notification is-warning is-light">
+        <div v-if="currentUser.role === 'admin'" class="notification is-info is-light admin-view-banner">
           <strong>Admin View:</strong> You can see admin-only controls.
         </div>
 
@@ -131,10 +162,19 @@ function stretchNamesByIds(stretchIds: number[]) {
         </div>
 
         <div v-else class="content">
-          <div v-for="workout in activityWorkouts" :key="workout.id" class="box mb-4">
-            <p class="mb-2">
-              <strong>{{ userNameById(workout.userId) }}</strong> published a workout
-            </p>
+          <div v-for="workout in activityWorkouts" :key="workout.id" class="box mb-4 activity-card">
+            <div class="activity-header">
+              <span class="activity-avatar" :class="activityAvatarClass(workout.userId)">
+                {{ userInitialsById(workout.userId) }}
+              </span>
+              <div>
+                <p class="activity-lead mb-1">
+                  <strong>{{ userNameById(workout.userId) }}</strong>
+                  published a workout
+                </p>
+                <p class="meta-text mb-0">Shared with the crew just now.</p>
+              </div>
+            </div>
             <h3 class="title is-5 mb-2 heading-emphasis">{{ workout.title }}</h3>
             <p class="data-line">
               <strong>Time Workout:</strong> {{ workout.workoutTimeMinutes }} minutes |
@@ -150,3 +190,59 @@ function stretchNamesByIds(stretchIds: number[]) {
     </div>
   </section>
 </template>
+
+<style scoped>
+.admin-view-banner {
+  border: 1px solid #c4d8ec;
+  border-radius: 999px;
+  color: #184d7d;
+  background: linear-gradient(180deg, #eff6fd 0%, #e6f0fb 100%);
+  padding-inline: 1.1rem;
+}
+
+.activity-card {
+  padding: 1rem 1.1rem;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.activity-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 16px rgba(10, 28, 53, 0.14);
+}
+
+.activity-lead {
+  color: var(--text-body);
+}
+
+.avatar-tone-a {
+  background: linear-gradient(135deg, #0d5a42 0%, #1c8a66 100%);
+}
+
+.avatar-tone-b {
+  background: linear-gradient(135deg, #184d7d 0%, #4579ad 100%);
+}
+
+.avatar-tone-c {
+  background: linear-gradient(135deg, #7a5d1c 0%, #c08b24 100%);
+}
+
+.avatar-tone-d {
+  background: linear-gradient(135deg, #5c3c78 0%, #8f67a9 100%);
+}
+</style>

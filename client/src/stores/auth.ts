@@ -49,6 +49,27 @@ export const useAuthStore = defineStore('auth', function () {
     }
   }
 
+  async function savePreferredMuscleGroups(preferredMuscleGroups: string[]) {
+    if (currentUser.value === null) {
+      throw new Error('You must be logged in to save muscle focus.')
+    }
+
+    const updatedUser = await api<User>(
+      `/users/${currentUser.value.id}/focus-muscles`,
+      { preferredMuscleGroups },
+      { method: 'PATCH' },
+    )
+
+    currentUser.value = updatedUser
+    accountOptions.value = accountOptions.value.map(function (account) {
+      if (account.id === updatedUser.id) {
+        return updatedUser
+      }
+
+      return account
+    })
+  }
+
   void loadAccounts()
 
   return {
@@ -61,5 +82,6 @@ export const useAuthStore = defineStore('auth', function () {
     loadAccounts,
     loginAs,
     logout,
+    savePreferredMuscleGroups,
   }
 })

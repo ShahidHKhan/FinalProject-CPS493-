@@ -33,6 +33,7 @@ export async function getAll(params: PagingRequest): Promise<{ list: ItemType[];
     id: user.id,
     name: user.name,
     role: user.role,
+    preferredMuscleGroups: user.preferred_muscle_groups ?? [],
   })) as ItemType[];
   const count = result.count ?? 0;
 
@@ -52,12 +53,14 @@ export async function get(id: number): Promise<ItemType> {
     id: result.data.id,
     name: result.data.name,
     role: result.data.role,
+    preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
 }
 
 export async function create(userInput: Omit<ItemType, 'id'>): Promise<ItemType> {
   const db = connect();
-  const result = await db.from(TABLE_NAME).insert(userInput).select().single();
+  const payload = toSnakeCase(filterKeys(userInput as any, ['name', 'role', 'preferredMuscleGroups']));
+  const result = await db.from(TABLE_NAME).insert(payload).select().single();
 
   if (result.error) {
     throw result.error;
@@ -67,12 +70,14 @@ export async function create(userInput: Omit<ItemType, 'id'>): Promise<ItemType>
     id: result.data.id,
     name: result.data.name,
     role: result.data.role,
+    preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
 }
 
 export async function update(id: number, userPatch: Partial<ItemType>): Promise<ItemType> {
   const db = connect();
-  const result = await db.from(TABLE_NAME).update(userPatch).eq('id', id).select().single();
+  const payload = toSnakeCase(filterKeys(userPatch as any, ['name', 'role', 'preferredMuscleGroups']));
+  const result = await db.from(TABLE_NAME).update(payload).eq('id', id).select().single();
 
   if (result.error) {
     throw result.error;
@@ -82,6 +87,28 @@ export async function update(id: number, userPatch: Partial<ItemType>): Promise<
     id: result.data.id,
     name: result.data.name,
     role: result.data.role,
+    preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
+  };
+}
+
+export async function updatePreferredMuscleGroups(id: number, preferredMuscleGroups: string[]): Promise<ItemType> {
+  const db = connect();
+  const result = await db
+    .from(TABLE_NAME)
+    .update({ preferred_muscle_groups: preferredMuscleGroups })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return {
+    id: result.data.id,
+    name: result.data.name,
+    role: result.data.role,
+    preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
 }
 
@@ -97,6 +124,7 @@ export async function remove(id: number): Promise<ItemType> {
     id: result.data.id,
     name: result.data.name,
     role: result.data.role,
+    preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
 }
 
@@ -106,7 +134,9 @@ export async function seed() {
     items: data1 as ItemType[],
   };
 
-  const items = data.items.map((item) => toSnakeCase(filterKeys(item as any, ['name', 'role'])));
+  const items = data.items.map((item) =>
+    toSnakeCase(filterKeys(item as any, ['name', 'role', 'preferredMuscleGroups'])),
+  );
   const result = await db.from(TABLE_NAME).insert(items);
 
   if (result.error) {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ref } from 'vue'
+import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
@@ -28,13 +29,43 @@ const muscleGroupOptions = [
 ] as const
 
 const selectedHealingMuscles = ref<string[]>([])
+const saveError = ref('')
+const isSavingFocus = ref(false)
 
-function toggleMuscle(muscle: string) {
+watch(
+  currentUser,
+  function (user) {
+    selectedHealingMuscles.value = [...(user?.preferredMuscleGroups ?? [])]
+    saveError.value = ''
+  },
+  { immediate: true },
+)
+
+async function toggleMuscle(muscle: string) {
+  if (!currentUser.value) {
+    return
+  }
+
+  const previousSelection = [...selectedHealingMuscles.value]
+
   const index = selectedHealingMuscles.value.indexOf(muscle)
   if (index > -1) {
     selectedHealingMuscles.value.splice(index, 1)
   } else {
     selectedHealingMuscles.value.push(muscle)
+  }
+
+  const nextSelection = [...selectedHealingMuscles.value]
+  saveError.value = ''
+  isSavingFocus.value = true
+
+  try {
+    await authStore.savePreferredMuscleGroups(nextSelection)
+  } catch {
+    selectedHealingMuscles.value = previousSelection
+    saveError.value = 'Could not save your focus muscles. Please try again.'
+  } finally {
+    isSavingFocus.value = false
   }
 }
 
@@ -77,6 +108,14 @@ const friendsList = computed(function () {
             </div>
 
             <h2 class="title is-4 heading-emphasis mt-6">Select muscles for focus</h2>
+
+            <p class="help has-text-grey mb-3">
+              {{ isSavingFocus ? 'Saving focus muscles...' : 'Changes save automatically to your profile.' }}
+            </p>
+
+            <div v-if="saveError" class="notification is-danger is-light py-2">
+              {{ saveError }}
+            </div>
 
             <div class="muscle-selection-box">
               <div class="muscle-pills">

@@ -33,4 +33,5 @@ export type simpleUser = {
   id: number;
   name: string;
   role: string;
+  preferredMuscleGroups: string[];
 };

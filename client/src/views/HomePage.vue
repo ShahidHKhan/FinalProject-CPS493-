@@ -103,19 +103,19 @@ function stretchNamesByIds(stretchIds: number[]) {
 
         <hr class="my-5" />
 
-        <h2 class="title is-4">Most Recent Workout</h2>
+        <h2 class="title is-4 heading-emphasis">Most Recent Workout</h2>
 
         <div v-if="!mostRecentWorkout" class="notification is-info is-light">
           You have not published a workout yet. Go to Workouts to create one.
         </div>
 
         <div v-else class="box">
-          <h3 class="title is-5 mb-2">{{ mostRecentWorkout.title }}</h3>
-          <p>
+          <h3 class="title is-5 mb-2 heading-emphasis">{{ mostRecentWorkout.title }}</h3>
+          <p class="data-line">
             <strong>Time Workout:</strong> {{ mostRecentWorkout.workoutTimeMinutes }} minutes |
             <strong>Published:</strong> {{ formatPublishedDate(mostRecentWorkout.publishedAt) }}
           </p>
-          <p>
+          <p class="meta-text">
             <strong>Stretches:</strong>
             {{ stretchNamesByIds(mostRecentWorkout.stretchIds) }}
           </p>
@@ -123,7 +123,7 @@ function stretchNamesByIds(stretchIds: number[]) {
 
         <hr class="my-5" />
 
-        <h2 class="title is-4">Friends Activity</h2>
+        <h2 class="title is-4 heading-emphasis">Friends Activity</h2>
 
         <div v-if="activityWorkouts.length === 0" class="notification is-info is-light">
           No friend activity yet. Once friends publish workouts, it will appear here.
@@ -134,12 +134,12 @@ function stretchNamesByIds(stretchIds: number[]) {
             <p class="mb-2">
               <strong>{{ userNameById(workout.userId) }}</strong> published a workout
             </p>
-            <h3 class="title is-5 mb-2">{{ workout.title }}</h3>
-            <p>
+            <h3 class="title is-5 mb-2 heading-emphasis">{{ workout.title }}</h3>
+            <p class="data-line">
               <strong>Time Workout:</strong> {{ workout.workoutTimeMinutes }} minutes |
               <strong>Published:</strong> {{ formatPublishedDate(workout.publishedAt) }}
             </p>
-            <p>
+            <p class="meta-text">
               <strong>Stretches:</strong>
               {{ stretchNamesByIds(workout.stretchIds) }}
             </p>

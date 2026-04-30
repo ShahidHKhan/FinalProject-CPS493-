@@ -35,6 +35,10 @@ function toggleSidebar() {
   isSidebarActive.value = !isSidebarActive.value
 }
 
+function closeSidebar() {
+  isSidebarActive.value = false
+}
+
 function toggleStretchCatalog() {
   showStretchCatalog.value = !showStretchCatalog.value
 }
@@ -233,10 +237,11 @@ watch(currentUser, function () {
       class="sidebar-toggle"
       type="button"
       :aria-expanded="isSidebarActive"
-      :style="{ right: isSidebarActive ? `${sidebarWidth}px` : '0px' }"
+      :aria-label="isSidebarActive ? 'Close preset workouts sidebar' : 'Open preset workouts sidebar'"
+      :style="{ right: isSidebarActive ? `${sidebarWidth + 16}px` : '16px' }"
       @click="toggleSidebar"
     >
-      Preset
+      {{ isSidebarActive ? 'Close Presets' : 'Open Presets' }}
     </button>
     <div class="container">
       <div v-if="!currentUser" class="notification is-warning is-light">
@@ -247,7 +252,7 @@ watch(currentUser, function () {
         <h1 class="title">Workouts</h1>
 
         <div class="box mb-5">
-          <h2 class="title is-5 mb-3">Your Saved Workouts</h2>
+          <h2 class="title is-5 mb-3 heading-emphasis">Your Saved Workouts</h2>
 
           <div v-if="isLoadingWorkouts" class="notification is-info is-light py-3">
             Loading workouts...
@@ -261,10 +266,10 @@ watch(currentUser, function () {
 
           <div v-else class="workout-list">
             <article v-for="workout in currentUserWorkouts" :key="workout.id" class="box workout-card">
-              <h3 class="title is-6 mb-2">{{ workout.title }}</h3>
-              <p class="mb-1"><strong>Time:</strong> {{ workout.workoutTimeMinutes }} minutes</p>
-              <p class="mb-1"><strong>Stretches:</strong> {{ workout.stretchIds.length }}</p>
-              <p class="has-text-grey is-size-7">Published: {{ workout.publishedAt }}</p>
+              <h3 class="title is-6 mb-2 heading-emphasis">{{ workout.title }}</h3>
+              <p class="mb-1 data-line"><strong>Time:</strong> {{ workout.workoutTimeMinutes }} minutes</p>
+              <p class="mb-1 data-line"><strong>Stretches:</strong> {{ workout.stretchIds.length }}</p>
+              <p class="meta-text">Published: {{ workout.publishedAt }}</p>
             </article>
           </div>
         </div>
@@ -365,7 +370,10 @@ watch(currentUser, function () {
 
     <Sidebar :is-active="isSidebarActive" :width="sidebarWidth">
       <div class="sidebar-content">
-        <h3 class="title is-5">Preset Workouts</h3>
+        <div class="sidebar-header">
+          <h3 class="title is-5 mb-0">Preset Workouts</h3>
+          <button class="button is-small is-light sidebar-close-btn" type="button" @click="closeSidebar">Close</button>
+        </div>
 
         <div v-if="presetErrorMessage" class="notification is-danger is-light py-3">
           {{ presetErrorMessage }}
@@ -406,23 +414,49 @@ watch(currentUser, function () {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 45;
-  border: 1px solid #c56a00;
-  border-right: 0;
-  border-radius: 10px 0 0 10px;
-  background: #f39c12;
+  z-index: 52;
+  border: 2px solid #0a3a2b;
+  border-radius: 12px;
+  background-color: #0d5a42;
+  box-shadow: 0 0 0 2px rgba(13, 90, 66, 0.25), 0 12px 22px rgba(10, 28, 53, 0.32);
   color: #ffffff;
-  font-weight: 700;
-  font-size: 1.05rem;
-  min-height: 3.5rem;
-  padding: 0.95rem 1.35rem;
-  transition: right 0.3s ease-in-out;
+  font-weight: 800;
+  font-size: 1rem;
+  min-height: 3.15rem;
+  min-width: 11rem;
+  padding: 0.75rem 1rem;
+  transition: right 0.3s ease-in-out, background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.sidebar-toggle:hover {
+  background-color: #0a3a2b;
+  transform: translateY(calc(-50% - 1px));
 }
 
 .sidebar-content {
   height: 100%;
   overflow-y: auto;
   padding: 1rem;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.sidebar-close-btn {
+  border-color: #cfdad3;
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar-toggle {
+    top: 50%;
+    min-width: 9.5rem;
+    font-size: 0.92rem;
+    padding: 0.65rem 0.8rem;
+  }
 }
 
 .stretch-grid {
@@ -457,7 +491,7 @@ watch(currentUser, function () {
 }
 
 .catalog-dropdown {
-  border: 1px solid #ddd;
+  border: 1px solid #dce7df;
   border-radius: 0.5rem;
   max-height: 460px;
   overflow-y: auto;
@@ -478,6 +512,6 @@ watch(currentUser, function () {
 }
 
 .catalog-item + .catalog-item {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e8eeeb;
 }
 </style>

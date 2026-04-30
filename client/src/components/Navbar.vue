@@ -142,8 +142,9 @@ function handleLogout() {
 
 <style scoped>
 .site-navbar {
-  background-color: #f39c12;
-  border-bottom: 5px solid #c56a00;
+  background: linear-gradient(100deg, #0a1c35 0%, #0d5a42 86%);
+  border-bottom: 1px solid rgba(163, 192, 101, 0.45);
+  box-shadow: 0 10px 20px rgba(10, 28, 53, 0.32);
   min-height: 5rem;
 }
 
@@ -156,31 +157,31 @@ function handleLogout() {
 .site-navbar .navbar-menu,
 .site-navbar .navbar-start,
 .site-navbar .navbar-end {
-  background-color: #f39c12;
+  background: transparent;
 }
 
 .navbar-burger {
-  color: #ffffff;
+  color: #f4f8f5;
   margin-left: auto;
 }
 
 .nav-link {
-  font-size: 1.4rem;
+  font-size: 1.16rem;
   font-weight: 700;
-  color: #f7f9ff;
+  color: #f2f7f2;
   min-height: 4.25rem;
   padding-inline: 1.35rem;
 }
 
 .nav-link:hover {
-  background-color: rgba(197, 106, 0, 0.24);
+  background-color: rgba(163, 192, 101, 0.16);
   color: #ffffff;
 }
 
 .nav-link.is-active,
 .router-link-active.nav-link {
-  background-color: #c56a00;
-  box-shadow: inset 0 -3px 0 #fff1de;
+  background-color: rgba(163, 192, 101, 0.24);
+  box-shadow: inset 0 -3px 0 var(--brand-lime);
   color: #ffffff;
 }
 
@@ -189,7 +190,7 @@ function handleLogout() {
 }
 
 .nav-admin-link {
-  color: #f7f9ff;
+  color: #f2f7f2;
   min-height: 4.25rem;
   display: flex;
   align-items: center;
@@ -218,8 +219,8 @@ function handleLogout() {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  background: #fff1de;
-  color: #8e4f00;
+  background: var(--brand-lime);
+  color: var(--brand-midnight);
   font-size: 0.8rem;
   font-weight: 800;
 }
@@ -233,12 +234,13 @@ function handleLogout() {
 .user-name {
   font-size: 1.05rem;
   font-weight: 800;
+  color: #ffffff;
 }
 
 .user-role {
   font-size: 0.8rem;
   text-transform: capitalize;
-  opacity: 0.9;
+  color: #d4e4da;
 }
 
 .is-disabled {
@@ -261,15 +263,43 @@ function handleLogout() {
 
 .nav-admin-dropdown .navbar-item.is-active,
 .nav-admin-dropdown .router-link-active {
-  background-color: rgba(197, 106, 0, 0.14);
+  background-color: rgba(163, 192, 101, 0.24);
   font-weight: 700;
 }
 
 .nav-account-button {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 700;
-  min-height: 3.1rem;
+  min-height: 2.8rem;
   padding-inline: 1.1rem;
+}
+
+.button.nav-account-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.button.nav-account-button:hover {
+  background-color: rgba(163, 192, 101, 0.22);
+  color: #ffffff;
+}
+
+.button.is-danger.is-light.nav-account-button {
+  background-color: var(--brand-lime);
+  border-color: #8ca956;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(163, 192, 101, 0.28), 0 10px 18px rgba(10, 28, 53, 0.34);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.button.is-danger.is-light.nav-account-button:hover {
+  background-color: #93b15c;
+  border-color: #789246;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(163, 192, 101, 0.42), 0 14px 24px rgba(10, 28, 53, 0.42);
+  transform: translateY(-1px);
 }
 
 .site-navbar .navbar-item {

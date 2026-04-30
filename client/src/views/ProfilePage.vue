@@ -77,7 +77,7 @@ function stretchNamesByIds(stretchIds: number[]) {
 
         <div class="columns is-variable is-6 profile-layout">
           <div class="column is-two-thirds">
-            <h2 class="title is-4">Published Workouts</h2>
+            <h2 class="title is-4 heading-emphasis">Published Workouts</h2>
 
             <div v-if="userWorkouts.length === 0" class="notification is-info is-light">
               No workouts published yet. Go to Workouts to create and publish one.
@@ -85,12 +85,12 @@ function stretchNamesByIds(stretchIds: number[]) {
 
             <div v-else class="content">
               <div v-for="workout in userWorkouts" :key="workout.id" class="box mb-4">
-                <h3 class="title is-5">{{ workout.title }}</h3>
-                <p>
+                <h3 class="title is-5 heading-emphasis">{{ workout.title }}</h3>
+                <p class="data-line">
                   <strong>Time Workout:</strong> {{ workout.workoutTimeMinutes }} minutes |
                   <strong>Published:</strong> {{ formatPublishedDate(workout.publishedAt) }}
                 </p>
-                <p>
+                <p class="meta-text">
                   <strong>Stretches:</strong>
                   {{ stretchNamesByIds(workout.stretchIds) }}
                 </p>

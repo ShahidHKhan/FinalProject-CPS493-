@@ -10,11 +10,14 @@ const footerLineText = 'CPS 493 - Midterm - Shahid Khan - 2026'
 
 <style scoped>
 .footer-min {
-  padding: 0.75rem 1rem;
-  border-top: 1px solid #ddd;
+  padding: 0.9rem 1rem;
+  border-top: 1px solid rgba(163, 192, 101, 0.35);
+  background: linear-gradient(100deg, #0a1c35 0%, #0d5a42 86%);
 }
 
 p {
   margin: 0;
+  color: #e8f1ec;
+  font-weight: 600;
 }
 </style>

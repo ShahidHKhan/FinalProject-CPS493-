@@ -20,6 +20,7 @@ export type UserRole = 'admin' | 'regular'
 export interface User {
   id: number
   name: string
+  email?: string
   role: UserRole
   preferredMuscleGroups: string[]
 }

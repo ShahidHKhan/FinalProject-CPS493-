@@ -32,6 +32,7 @@ export type user = {
 export type simpleUser = {
   id?: number;
   name?: string;
+  email?: string;
   role?: string;
   preferredMuscleGroups?: string[];
 };

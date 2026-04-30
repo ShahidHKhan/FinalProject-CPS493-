@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { DataEnvelope } from '../../../server/types'
 import { computed, ref } from 'vue'
 
+import { useAuthStore } from './auth'
 import { api as myApi, loadScript } from '../services/myFetch'
 
 type SessionUser = {
@@ -50,6 +51,7 @@ export type FeedbackMessage = {
 export const useSessionStore = defineStore('session', () => {
 	const user = ref<SessionUser | null>(null)
 	const token = ref<string | null>(null)
+	const authStore = useAuthStore()
 
 	async function login() {
 		await loadScript('https://accounts.google.com/gsi/client', 'google-signin')
@@ -74,6 +76,7 @@ export const useSessionStore = defineStore('session', () => {
 				}
 
 				await setUser(response.access_token)
+				await syncCurrentProfile()
 				await getCalendarEvents(response.access_token)
 			},
 		})
@@ -137,9 +140,31 @@ export const useSessionStore = defineStore('session', () => {
 		token.value = authToken
 	}
 
+	async function syncCurrentProfile() {
+		await authStore.loadAccounts()
+
+		const googleEmail = user.value?.email?.trim().toLowerCase()
+		if (!googleEmail) {
+			authStore.logout()
+			return
+		}
+
+		const matchingAccount = authStore.availableAccounts.find(function (account) {
+			return account.email?.trim().toLowerCase() === googleEmail
+		})
+
+		if (!matchingAccount) {
+			authStore.logout()
+			return
+		}
+
+		authStore.loginAs(matchingAccount)
+	}
+
 	function logout() {
 		user.value = null
 		token.value = null
+		authStore.logout()
 	}
 
 	const messages = ref<FeedbackMessage[]>([])

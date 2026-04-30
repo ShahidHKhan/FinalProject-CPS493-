@@ -237,12 +237,26 @@ export async function seed(): Promise<number> {
     items: data1 as Array<Record<string, any>>,
   };
 
+  const usersResponse = await db.from('users').select('id, name').order('id', { ascending: true });
+
+  if (usersResponse.error) {
+    throw usersResponse.error;
+  }
+
+  const seededUsers = usersResponse.data ?? [];
+
   // prepare items for insert
-  const workoutKeys = ['userId', 'title', 'workoutTimeMinutes'];
+  const workoutKeys = ['title', 'workoutTimeMinutes'];
   const items = data.items.map((item) => {
     const snake = toSnakeCase(filterKeys(item, workoutKeys));
+    const matchingUser = seededUsers[item.userId - 1];
+
+    if (!matchingUser) {
+      throw new Error(`Missing seeded user for workout ${item.title}`)
+    }
+
     // ensure published_at
-    return { ...snake, published_at: new Date().toISOString() };
+    return { ...snake, user_id: matchingUser.id, published_at: new Date().toISOString() };
   });
 
   const existingRes = await db.from(TABLE_NAME).select('id, title');

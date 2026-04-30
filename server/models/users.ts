@@ -32,6 +32,7 @@ export async function getAll(params: PagingRequest): Promise<{ list: ItemType[];
   const list = (result.data ?? []).map((user) => ({
     id: user.id,
     name: user.name,
+    email: user.email,
     role: user.role,
     preferredMuscleGroups: user.preferred_muscle_groups ?? [],
   })) as ItemType[];
@@ -52,6 +53,7 @@ export async function get(id: number): Promise<ItemType> {
   return {
     id: result.data.id,
     name: result.data.name,
+    email: result.data.email,
     role: result.data.role,
     preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
@@ -59,7 +61,7 @@ export async function get(id: number): Promise<ItemType> {
 
 export async function create(userInput: Omit<ItemType, 'id'>): Promise<ItemType> {
   const db = connect();
-  const payload = toSnakeCase(filterKeys(userInput as any, ['name', 'role', 'preferredMuscleGroups']));
+  const payload = toSnakeCase(filterKeys(userInput as any, ['name', 'email', 'role', 'preferredMuscleGroups']));
   const result = await db.from(TABLE_NAME).insert(payload).select().single();
 
   if (result.error) {
@@ -69,6 +71,7 @@ export async function create(userInput: Omit<ItemType, 'id'>): Promise<ItemType>
   return {
     id: result.data.id,
     name: result.data.name,
+    email: result.data.email,
     role: result.data.role,
     preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
@@ -76,7 +79,7 @@ export async function create(userInput: Omit<ItemType, 'id'>): Promise<ItemType>
 
 export async function update(id: number, userPatch: Partial<ItemType>): Promise<ItemType> {
   const db = connect();
-  const payload = toSnakeCase(filterKeys(userPatch as any, ['name', 'role', 'preferredMuscleGroups']));
+  const payload = toSnakeCase(filterKeys(userPatch as any, ['name', 'email', 'role', 'preferredMuscleGroups']));
   const result = await db.from(TABLE_NAME).update(payload).eq('id', id).select().single();
 
   if (result.error) {
@@ -86,6 +89,7 @@ export async function update(id: number, userPatch: Partial<ItemType>): Promise<
   return {
     id: result.data.id,
     name: result.data.name,
+    email: result.data.email,
     role: result.data.role,
     preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
@@ -107,6 +111,7 @@ export async function updatePreferredMuscleGroups(id: number, preferredMuscleGro
   return {
     id: result.data.id,
     name: result.data.name,
+    email: result.data.email,
     role: result.data.role,
     preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
@@ -123,6 +128,7 @@ export async function remove(id: number): Promise<ItemType> {
   return {
     id: result.data.id,
     name: result.data.name,
+    email: result.data.email,
     role: result.data.role,
     preferredMuscleGroups: result.data.preferred_muscle_groups ?? [],
   };
@@ -134,8 +140,14 @@ export async function seed() {
     items: data1 as ItemType[],
   };
 
+  const cleared = await db.from(TABLE_NAME).delete().gte('id', 1);
+
+  if (cleared.error) {
+    throw cleared.error;
+  }
+
   const items = data.items.map((item) =>
-    toSnakeCase(filterKeys(item as any, ['name', 'role', 'preferredMuscleGroups'])),
+    toSnakeCase(filterKeys(item as any, ['name', 'email', 'role', 'preferredMuscleGroups'])),
   );
   const result = await db.from(TABLE_NAME).insert(items);
 

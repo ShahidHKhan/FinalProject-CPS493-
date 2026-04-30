@@ -1,23 +1,37 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../stores/auth'
 import { useSessionStore } from '../stores/session'
 
+const authStore = useAuthStore()
 const sessionStore = useSessionStore()
-const { user } = storeToRefs(sessionStore)
+const { user: sessionUser } = storeToRefs(sessionStore)
 const { login, logout } = sessionStore
 
 const showMobileMenu = ref(false)
+const { currentUser } = storeToRefs(authStore)
 const isAdmin = computed(function () {
-  return user.value?.role === 'admin'
+  return currentUser.value?.role === 'admin' || sessionUser.value?.role === 'admin'
+})
+
+const profile = computed(function () {
+  if (currentUser.value) {
+    return {
+      name: currentUser.value.name,
+      role: currentUser.value.role,
+      email: sessionUser.value?.email ?? '',
+      image: sessionUser.value?.image ?? '',
+    }
+  }
+
+  return sessionUser.value
 })
 
 const userInitials = computed(function () {
-  if (!user.value) {
-    return ''
-  }
+  if (!profile.value || !profile.value.name) return ''
 
-  return user.value.name
+  return profile.value.name
     .split(' ')
     .filter(function (part) {
       return part.length > 0
@@ -43,6 +57,8 @@ async function handleLogin() {
 }
 
 function handleLogout() {
+  // Clear both the app-selected profile and the OAuth session
+  authStore.logout()
   logout()
   closeMenus()
 }
@@ -86,10 +102,10 @@ function handleLogout() {
         </div>
 
         <div class="navbar-end is-align-items-center">
-          <div v-if="user" class="navbar-item has-text-white user-chip">
+          <div v-if="profile" class="navbar-item has-text-white user-chip">
             <img
-              v-if="user.image"
-              :src="user.image"
+              v-if="profile.image"
+              :src="profile.image"
               alt="Profile Picture"
               class="user-avatar"
               width="30"
@@ -97,8 +113,8 @@ function handleLogout() {
             />
             <span v-else class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
             <div class="user-meta">
-              <span class="user-name">{{ user.name }}</span>
-              <span class="user-role">{{ user.email }}</span>
+              <span class="user-name">{{ profile.name }}</span>
+              <span class="user-role">{{ profile.email }}</span>
             </div>
             <button class="button is-danger is-light nav-account-button" @click="handleLogout">Log out</button>
           </div>

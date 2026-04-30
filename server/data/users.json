@@ -1,5 +1,5 @@
 [
-	{ "id": 1, "name": "Admin Shahid", "role": "admin" },
-	{ "id": 2, "name": "Josh", "role": "user" },
-	{ "id": 3, "name": "Michael", "role": "user" }
+	{ "id": 1, "name": "Admin Shahid", "email": "mrshahid2005@gmail.com", "role": "admin" },
+	{ "id": 2, "name": "Josh", "email": "josh@example.com", "role": "user" },
+	{ "id": 3, "name": "Michael", "email": "michael@example.com", "role": "user" }
 ]

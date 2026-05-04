@@ -31,26 +31,26 @@ app
       res.status(404).send({ isSuccess: false, message: 'Stretch not found' });
     }
   })
-  .post('/', (req, res) => {
-    const newStretch = create(req.body);
+  .post('/', async (req, res) => {
+    const newStretch = await create(req.body);
 
     res.status(201).send(newStretch);
   })
-  .patch('/:id', (req, res) => {
+  .patch('/:id', async (req, res) => {
     const stretchId = Number.parseInt(req.params.id, 10);
 
     try {
-      const updatedStretch = update(stretchId, req.body);
+      const updatedStretch = await update(stretchId, req.body);
       res.send(updatedStretch);
     } catch {
       res.status(404).send({ isSuccess: false, message: 'Stretch not found' });
     }
   })
-  .delete('/:id', (req, res) => {
+  .delete('/:id', async (req, res) => {
     const stretchId = Number.parseInt(req.params.id, 10);
 
     try {
-      const removedStretch = remove(stretchId);
+      const removedStretch = await remove(stretchId);
       const response: DataEnvelope<Stretch> = {
         data: removedStretch,
         isSuccess: true,

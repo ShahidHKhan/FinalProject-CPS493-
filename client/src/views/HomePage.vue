@@ -108,6 +108,10 @@ function stretchNamesByIds(stretchIds: number[]) {
     return stretchNameById(stretchId)
   }).join(', ')
 }
+
+function selectAccount(account: (typeof availableAccounts.value)[number]) {
+  authStore.loginAs(account)
+}
 </script>
 
 <template>
@@ -121,6 +125,29 @@ function stretchNamesByIds(stretchIds: number[]) {
       <div v-else-if="!currentUser && googleUser" class="notification is-warning is-light mb-5">
         <strong>Signed in with Google:</strong> {{ googleUser.name }}.
         No matching app profile is linked to this account, so the app cannot switch profiles.
+      </div>
+
+      <div v-if="!currentUser && googleUser" class="box profile-picker mb-5">
+        <h2 class="title is-4 mb-2">Choose a profile</h2>
+        <p class="mb-4">
+          Pick the local app account you want to use after Google sign-in.
+        </p>
+
+        <div v-if="availableAccounts.length === 0" class="notification is-info is-light">
+          No accounts are available yet.
+        </div>
+
+        <div v-else class="profile-grid">
+          <button
+            v-for="account in availableAccounts"
+            :key="account.id"
+            class="button is-light profile-card"
+            @click="selectAccount(account)"
+          >
+            <span class="profile-name">{{ account.name }}</span>
+            <span class="tag is-small is-info is-light">{{ account.role }}</span>
+          </button>
+        </div>
       </div>
 
       <template v-else>

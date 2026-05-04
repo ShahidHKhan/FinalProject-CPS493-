@@ -52,9 +52,10 @@ export const useSessionStore = defineStore('session', () => {
 	const user = ref<SessionUser | null>(null)
 	const token = ref<string | null>(null)
 	const authStore = useAuthStore()
+	const googleScriptPromise = loadScript('https://accounts.google.com/gsi/client', 'google-signin')
 
 	async function login() {
-		await loadScript('https://accounts.google.com/gsi/client', 'google-signin')
+		await googleScriptPromise
 
 		const google = (window as Window & { google?: GoogleApi }).google
 		const tokenClient = google?.accounts?.oauth2?.initTokenClient

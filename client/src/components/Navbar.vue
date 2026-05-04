@@ -53,7 +53,13 @@ function toggleMobileMenu() {
 
 async function handleLogin() {
   closeMenus()
-  await login()
+
+  try {
+    await login()
+  } catch (error) {
+    console.error(error)
+    window.alert(error instanceof Error ? error.message : 'Unable to start login.')
+  }
 }
 
 function handleLogout() {

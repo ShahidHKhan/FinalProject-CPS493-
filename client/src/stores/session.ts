@@ -59,13 +59,18 @@ export const useSessionStore = defineStore('session', () => {
 
 		const google = (window as Window & { google?: GoogleApi }).google
 		const tokenClient = google?.accounts?.oauth2?.initTokenClient
+		const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()
 
 		if (!tokenClient) {
 			throw new Error('Google OAuth client is unavailable.')
 		}
 
+		if (!clientId) {
+			throw new Error('Google login is not configured for this deployment. Set VITE_GOOGLE_CLIENT_ID and rebuild the client.')
+		}
+
 		const client = tokenClient({
-			client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+			client_id: clientId,
 			scope: 'email profile https://www.googleapis.com/auth/calendar.events.readonly',
 			callback: async (response) => {
 				if (response.error) {

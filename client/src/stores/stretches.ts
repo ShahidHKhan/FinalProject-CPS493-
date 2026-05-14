@@ -3,17 +3,23 @@ import { ref } from 'vue'
 import type { Stretch } from './types'
 import { getStretches } from '../services/stretches'
 
+type LoadStretchOptions = {
+  page?: number
+  pageSize?: number
+  search?: string
+}
+
 export const useStretchStore = defineStore('stretch', function () {
   const stretches = ref<Stretch[]>([])
   const isLoading = ref(false)
   const error = ref('')
 
-  async function loadStretches() {
+  async function loadStretches(options: LoadStretchOptions = {}) {
     isLoading.value = true
     error.value = ''
 
     try {
-      const response = await getStretches({ page: 1, pageSize: 1000 })
+      const response = await getStretches(options)
       stretches.value = response.data
     } catch {
       stretches.value = []
@@ -22,8 +28,6 @@ export const useStretchStore = defineStore('stretch', function () {
       isLoading.value = false
     }
   }
-
-  void loadStretches()
 
   return { stretches, isLoading, error, loadStretches }
 })

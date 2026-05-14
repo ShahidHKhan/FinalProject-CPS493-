@@ -80,7 +80,10 @@ const friendsList = computed(function () {
 <template>
   <section class="section">
     <div class="container">
-      <div v-if="!currentUser" class="notification is-warning is-light">
+      <div
+        v-if="!currentUser"
+        class="notification is-warning is-light"
+      >
         <strong>Log in first:</strong> Select an account on the Home page to access Profile.
       </div>
 
@@ -93,14 +96,24 @@ const friendsList = computed(function () {
           <div class="column is-one-third">
             <h2 class="title is-4">Friends List</h2>
 
-            <div v-if="friendsList.length === 0" class="notification is-info is-light">
+            <div
+              v-if="friendsList.length === 0"
+              class="notification is-info is-light"
+            >
               No friends found.
             </div>
 
-            <div v-else class="box mb-5">
+            <div
+              v-else
+              class="box mb-5"
+            >
               <p class="mb-3 has-text-grey">All accounts are friends with each other.</p>
               <ul>
-                <li v-for="friend in friendsList" :key="friend.id" class="mb-3 friend-item">
+                <li
+                  v-for="friend in friendsList"
+                  :key="friend.id"
+                  class="mb-3 friend-item"
+                >
                   <strong>{{ friend.name }}</strong>
                   <span class="tag is-light ml-2">{{ friend.role }}</span>
                 </li>
@@ -113,7 +126,10 @@ const friendsList = computed(function () {
               {{ isSavingFocus ? 'Saving focus muscles...' : 'Changes save automatically to your profile.' }}
             </p>
 
-            <div v-if="saveError" class="notification is-danger is-light py-2">
+            <div
+              v-if="saveError"
+              class="notification is-danger is-light py-2"
+            >
               {{ saveError }}
             </div>
 
@@ -122,8 +138,8 @@ const friendsList = computed(function () {
                 <button
                   v-for="muscleGroup in muscleGroupOptions"
                   :key="muscleGroup"
-                  @click="toggleMuscle(muscleGroup)"
                   :class="['pill-button', { 'pill-button-active': selectedHealingMuscles.includes(muscleGroup) }]"
+                  @click="toggleMuscle(muscleGroup)"
                 >
                   {{ muscleGroup }}
                 </button>

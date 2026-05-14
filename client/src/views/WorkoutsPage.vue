@@ -5,7 +5,9 @@ import { useAuthStore } from '../stores/auth'
 import { useStretchStore } from '../stores/stretches'
 import { useWorkoutStore } from '../stores/workouts'
 import Sidebar from '../components/Sidebar.vue'
-import type { Workout } from '../stores/types'
+import { useInfiniteScroll } from '@vueuse/core'
+import { getStretches } from '../services/stretches'
+import type { Stretch, Workout } from '../stores/types'
 
 const authStore = useAuthStore()
 const stretchStore = useStretchStore()
@@ -33,6 +35,21 @@ const errorMessage = ref('')
 const deleteWorkoutError = ref('')
 const presetErrorMessage = ref('')
 
+const catalogStretches = ref<Stretch[]>([])
+const catalogTotal = ref(0)
+const catalogPage = ref(1)
+const catalogPageSize = ref(12)
+const catalogLoading = ref(false)
+const catalogError = ref('')
+const catalogScrollRef = ref<HTMLElement | null>(null)
+
+const canLoadMoreCatalog = computed(function () {
+  if (!showStretchCatalog.value) return false
+  if (catalogLoading.value) return false
+  if (catalogTotal.value === 0) return true
+  return catalogStretches.value.length < catalogTotal.value
+})
+
 function toggleSidebar() {
   isSidebarActive.value = !isSidebarActive.value
 }
@@ -44,6 +61,52 @@ function closeSidebar() {
 function toggleStretchCatalog() {
   showStretchCatalog.value = !showStretchCatalog.value
 }
+
+function resetCatalogPaging() {
+  catalogStretches.value = []
+  catalogTotal.value = 0
+  catalogPage.value = 1
+  catalogError.value = ''
+}
+
+async function loadNextCatalogPage() {
+  if (catalogLoading.value) return
+
+  if (catalogTotal.value > 0 && catalogStretches.value.length >= catalogTotal.value) {
+    return
+  }
+
+  catalogLoading.value = true
+  catalogError.value = ''
+
+  try {
+    const response = await getStretches({
+      page: catalogPage.value,
+      pageSize: catalogPageSize.value,
+    })
+
+    catalogStretches.value = [...catalogStretches.value, ...response.data]
+    catalogTotal.value = response.total
+    catalogPage.value += 1
+  } catch {
+    catalogError.value = 'Could not load stretches from the server.'
+  } finally {
+    catalogLoading.value = false
+  }
+}
+
+useInfiniteScroll(
+  catalogScrollRef,
+  async function () {
+    await loadNextCatalogPage()
+  },
+  {
+    distance: 120,
+    canLoadMore: function () {
+      return canLoadMoreCatalog.value
+    },
+  }
+)
 
 type PresetWorkout = {
   key: 'upper' | 'lower' | 'full-body' | 'arms'
@@ -142,6 +205,10 @@ function resetForm() {
 function createWorkout() {
   isCreatingWorkout.value = true
   errorMessage.value = ''
+
+  if (!isLoading.value && stretches.value.length === 0) {
+    void stretchStore.loadStretches({ page: 1, pageSize: 1000 })
+  }
 }
 
 function cancelCreate() {
@@ -254,10 +321,17 @@ function presetStretchNames(stretchIds: number[]) {
 
 onMounted(function () {
   void workoutStore.loadWorkouts()
+  void stretchStore.loadStretches({ page: 1, pageSize: 1000 })
 })
 
 watch(currentUser, function () {
   void workoutStore.loadWorkouts()
+})
+
+watch(showStretchCatalog, function (isOpen) {
+  if (!isOpen) return
+  resetCatalogPaging()
+  void loadNextCatalogPage()
 })
 </script>
 
@@ -274,7 +348,10 @@ watch(currentUser, function () {
       <span class="sidebar-label">Presets</span>
     </button>
     <div class="container">
-      <div v-if="!currentUser" class="notification is-warning is-light">
+      <div
+        v-if="!currentUser"
+        class="notification is-warning is-light"
+      >
         <strong>Log in first:</strong> Select an account on the Home page to access Workouts.
       </div>
 
@@ -284,22 +361,41 @@ watch(currentUser, function () {
         <div class="box mb-5">
           <h2 class="title is-5 mb-3 heading-emphasis">Your Saved Workouts</h2>
 
-          <div v-if="deleteWorkoutError" class="notification is-danger is-light py-3">
+          <div
+            v-if="deleteWorkoutError"
+            class="notification is-danger is-light py-3"
+          >
             {{ deleteWorkoutError }}
           </div>
 
-          <div v-if="isLoadingWorkouts" class="notification is-info is-light py-3">
+          <div
+            v-if="isLoadingWorkouts"
+            class="notification is-info is-light py-3"
+          >
             Loading workouts...
           </div>
-          <div v-else-if="workoutError" class="notification is-danger is-light py-3">
+          <div
+            v-else-if="workoutError"
+            class="notification is-danger is-light py-3"
+          >
             {{ workoutError }}
           </div>
-          <div v-else-if="currentUserWorkouts.length === 0" class="has-text-grey">
+          <div
+            v-else-if="currentUserWorkouts.length === 0"
+            class="has-text-grey"
+          >
             No saved workouts yet.
           </div>
 
-          <div v-else class="workout-list">
-            <article v-for="workout in currentUserWorkouts" :key="workout.id" class="box workout-card">
+          <div
+            v-else
+            class="workout-list"
+          >
+            <article
+              v-for="workout in currentUserWorkouts"
+              :key="workout.id"
+              class="box workout-card"
+            >
               <div class="workout-card-header mb-2">
                 <h3 class="title is-6 mb-0 heading-emphasis">{{ workout.title }}</h3>
                 <button
@@ -319,19 +415,36 @@ watch(currentUser, function () {
 
         <h2 class="title is-4">Custom Workout</h2>
 
-        <div v-if="!isCreatingWorkout" class="mb-5">
-          <button class="button is-primary" @click="createWorkout">Create Workout</button>
+        <div
+          v-if="!isCreatingWorkout"
+          class="mb-5"
+        >
+          <button
+            class="button is-primary"
+            @click="createWorkout"
+          >
+            Create Workout
+          </button>
         </div>
 
-        <div v-else class="box mb-5">
+        <div
+          v-else
+          class="box mb-5"
+        >
           <h2 class="title is-4">Create Workout</h2>
 
-          <div v-if="errorMessage" class="notification is-danger is-light py-3">
+          <div
+            v-if="errorMessage"
+            class="notification is-danger is-light py-3"
+          >
             {{ errorMessage }}
           </div>
 
           <div class="field">
-            <label class="label" for="workout-title">Workout Title</label>
+            <label
+              class="label"
+              for="workout-title"
+            >Workout Title</label>
             <div class="control">
               <input
                 id="workout-title"
@@ -339,12 +452,15 @@ watch(currentUser, function () {
                 class="input"
                 type="text"
                 placeholder="Example: Morning Mobility Session"
-              />
+              >
             </div>
           </div>
 
           <div class="field">
-            <label class="label" for="workout-time">Workout Time (minutes)</label>
+            <label
+              class="label"
+              for="workout-time"
+            >Workout Time (minutes)</label>
             <div class="control">
               <input
                 id="workout-time"
@@ -353,12 +469,24 @@ watch(currentUser, function () {
                 type="number"
                 min="1"
                 placeholder="30"
-              />
+              >
             </div>
           </div>
 
           <div class="field">
             <label class="label">Select Stretches Completed</label>
+            <p
+              v-if="isLoading"
+              class="help is-info"
+            >
+              Loading stretches...
+            </p>
+            <p
+              v-else-if="error"
+              class="help is-danger"
+            >
+              {{ error }}
+            </p>
             <div class="stretch-grid">
               <label
                 v-for="stretch in stretches"
@@ -369,7 +497,7 @@ watch(currentUser, function () {
                   type="checkbox"
                   :checked="selectedStretchIds.includes(stretch.id)"
                   @change="toggleStretch(stretch.id)"
-                />
+                >
                 <span>
                   {{ stretch.name }}
                   <small class="has-text-grey">({{ stretch.category }})</small>
@@ -379,24 +507,64 @@ watch(currentUser, function () {
           </div>
 
           <div class="buttons mt-4">
-            <button class="button is-success" @click="publishWorkout">Publish</button>
-            <button class="button is-light" @click="cancelCreate">Cancel</button>
+            <button
+              class="button is-success"
+              @click="publishWorkout"
+            >
+              Publish
+            </button>
+            <button
+              class="button is-light"
+              @click="cancelCreate"
+            >
+              Cancel
+            </button>
           </div>
         </div>
 
         <div class="box mb-5">
           <h2 class="title is-5 mb-3">Stretches Catalog</h2>
-          <button class="button is-info is-light" type="button" @click="toggleStretchCatalog">
+          <button
+            class="button is-info is-light"
+            type="button"
+            @click="toggleStretchCatalog"
+          >
             {{ showStretchCatalog ? 'Hide Stretches' : 'Show Stretches' }}
           </button>
 
-          <div v-if="showStretchCatalog" class="catalog-dropdown mt-3">
-            <div v-if="isLoading" class="catalog-item">Loading stretches...</div>
-            <div v-else-if="error" class="catalog-item has-text-danger">{{ error }}</div>
-            <div v-else-if="stretches.length === 0" class="catalog-item has-text-grey">
+          <div
+            v-if="showStretchCatalog"
+            ref="catalogScrollRef"
+            class="catalog-dropdown mt-3"
+          >
+            <div class="catalog-status">
+              Showing {{ catalogStretches.length }} of {{ catalogTotal || '-' }}
+            </div>
+
+            <div
+              v-if="catalogLoading && catalogStretches.length === 0"
+              class="catalog-item"
+            >
+              <div class="skeleton-line" />
+              <div class="skeleton-line is-short" />
+            </div>
+            <div
+              v-else-if="catalogError"
+              class="catalog-item has-text-danger"
+            >
+              {{ catalogError }}
+            </div>
+            <div
+              v-else-if="catalogStretches.length === 0"
+              class="catalog-item has-text-grey"
+            >
               No stretches were returned by the server.
             </div>
-            <div v-for="stretch in stretches" :key="`catalog-${stretch.id}`" class="catalog-item">
+            <div
+              v-for="stretch in catalogStretches"
+              :key="`catalog-${stretch.id}`"
+              class="catalog-item"
+            >
               <strong class="catalog-name">{{ stretch.name }}</strong>
               <p class="catalog-meta has-text-grey">
                 Muscle Group: {{ stretch.targetMuscles.join(', ') }}
@@ -405,25 +573,55 @@ watch(currentUser, function () {
                 Static-Status: {{ stretch.status }}
               </p>
             </div>
+
+            <div
+              v-if="catalogLoading && catalogStretches.length > 0"
+              class="catalog-item"
+            >
+              <div class="skeleton-line" />
+              <div class="skeleton-line is-short" />
+            </div>
+
+            <div
+              v-else-if="catalogTotal > 0 && catalogStretches.length >= catalogTotal"
+              class="catalog-item catalog-end"
+            >
+              All stretches loaded.
+            </div>
           </div>
         </div>
-
       </template>
     </div>
 
-    <Sidebar :is-active="isSidebarActive" :width="sidebarWidth">
+    <Sidebar
+      :is-active="isSidebarActive"
+      :width="sidebarWidth"
+    >
       <div class="sidebar-content">
         <div class="sidebar-header">
           <h3 class="title is-5 mb-0">Preset Workouts</h3>
-          <button class="button is-small is-light sidebar-close-btn" type="button" @click="closeSidebar">Close</button>
+          <button
+            class="button is-small is-light sidebar-close-btn"
+            type="button"
+            @click="closeSidebar"
+          >
+            Close
+          </button>
         </div>
 
-        <div v-if="presetErrorMessage" class="notification is-danger is-light py-3">
+        <div
+          v-if="presetErrorMessage"
+          class="notification is-danger is-light py-3"
+        >
           {{ presetErrorMessage }}
         </div>
 
         <div class="preset-grid mb-5">
-          <div v-for="preset in presetWorkouts" :key="preset.key" class="box preset-box">
+          <div
+            v-for="preset in presetWorkouts"
+            :key="preset.key"
+            class="box preset-box"
+          >
             <h4 class="title is-6">{{ preset.title }}</h4>
             <p class="mb-3">
               <strong>Includes:</strong>
@@ -431,7 +629,10 @@ watch(currentUser, function () {
             </p>
 
             <div class="field">
-              <label class="label" :for="`preset-time-${preset.key}`">Time (minutes)</label>
+              <label
+                class="label"
+                :for="`preset-time-${preset.key}`"
+              >Time (minutes)</label>
               <div class="control">
                 <input
                   :id="`preset-time-${preset.key}`"
@@ -440,11 +641,16 @@ watch(currentUser, function () {
                   type="number"
                   min="1"
                   placeholder="20"
-                />
+                >
               </div>
             </div>
 
-            <button class="button is-link is-small" @click="publishPresetWorkout(preset)">Publish</button>
+            <button
+              class="button is-link is-small"
+              @click="publishPresetWorkout(preset)"
+            >
+              Publish
+            </button>
           </div>
         </div>
       </div>
@@ -518,6 +724,9 @@ watch(currentUser, function () {
   display: grid;
   gap: 0.5rem;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
 }
 
 .preset-grid {
@@ -563,6 +772,15 @@ watch(currentUser, function () {
   overflow-y: auto;
 }
 
+.catalog-status {
+  background: #f6faf7;
+  border-bottom: 1px solid #e8eeeb;
+  color: #365b4e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+}
+
 .catalog-item {
   padding: 0.85rem 1rem;
 }
@@ -579,5 +797,35 @@ watch(currentUser, function () {
 
 .catalog-item + .catalog-item {
   border-top: 1px solid #e8eeeb;
+}
+
+.catalog-end {
+  color: #5b7a6e;
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, #eef2f0 25%, #e3e9e6 50%, #eef2f0 75%);
+  background-size: 200% 100%;
+  border-radius: 999px;
+  height: 12px;
+  margin-bottom: 0.55rem;
+  animation: catalog-loading 1.2s ease-in-out infinite;
+}
+
+.skeleton-line.is-short {
+  height: 10px;
+  margin-bottom: 0;
+  max-width: 65%;
+}
+
+@keyframes catalog-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 </style>

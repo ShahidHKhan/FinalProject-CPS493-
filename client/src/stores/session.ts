@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { defineStore } from 'pinia'
 import type { DataEnvelope } from '../../../server/types'
 import { computed, ref } from 'vue'

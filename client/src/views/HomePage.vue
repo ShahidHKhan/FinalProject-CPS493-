@@ -117,27 +117,42 @@ function selectAccount(account: (typeof availableAccounts.value)[number]) {
 <template>
   <section class="section">
     <div class="container">
-      <div v-if="!currentUser && !googleUser" class="notification is-warning is-light">
+      <div
+        v-if="!currentUser && !googleUser"
+        class="notification is-warning is-light"
+      >
         <strong>Log in first:</strong> Use the <strong>Log in</strong> button on the right side of the navbar.
         Then choose a profile.
       </div>
 
-      <div v-else-if="!currentUser && googleUser" class="notification is-warning is-light mb-5">
+      <div
+        v-else-if="!currentUser && googleUser"
+        class="notification is-warning is-light mb-5"
+      >
         <strong>Signed in with Google:</strong> {{ googleUser.name }}.
         No matching app profile is linked to this account, so the app cannot switch profiles.
       </div>
 
-      <div v-if="!currentUser && googleUser" class="box profile-picker mb-5">
+      <div
+        v-if="!currentUser && googleUser"
+        class="box profile-picker mb-5"
+      >
         <h2 class="title is-4 mb-2">Choose a profile</h2>
         <p class="mb-4">
           Pick the local app account you want to use after Google sign-in.
         </p>
 
-        <div v-if="availableAccounts.length === 0" class="notification is-info is-light">
+        <div
+          v-if="availableAccounts.length === 0"
+          class="notification is-info is-light"
+        >
           No accounts are available yet.
         </div>
 
-        <div v-else class="profile-grid">
+        <div
+          v-else
+          class="profile-grid"
+        >
           <button
             v-for="account in availableAccounts"
             :key="account.id"
@@ -151,33 +166,51 @@ function selectAccount(account: (typeof availableAccounts.value)[number]) {
       </div>
 
       <template v-else>
-        <div v-if="currentUser" class="box">
+        <div
+          v-if="currentUser"
+          class="box"
+        >
           <h1 class="title mb-4">Welcome, {{ currentUser.name }}!</h1>
 
           <p class="mb-4">
             Current role:
-            <span class="tag is-medium" :class="currentUser.role === 'admin' ? 'is-primary' : 'is-info'">
+            <span
+              class="tag is-medium"
+              :class="currentUser.role === 'admin' ? 'is-primary' : 'is-info'"
+            >
               {{ currentUser.role }}
             </span>
           </p>
 
-          <div v-if="currentUser.role === 'admin'" class="notification is-info is-light admin-view-banner">
+          <div
+            v-if="currentUser.role === 'admin'"
+            class="notification is-info is-light admin-view-banner"
+          >
             <strong>Admin View:</strong> You can see admin-only controls.
           </div>
 
-          <div v-else class="notification is-info is-light">
+          <div
+            v-else
+            class="notification is-info is-light"
+          >
             <strong>Regular View:</strong> You are signed in as a standard user.
           </div>
 
-          <hr class="my-5" />
+          <hr class="my-5">
 
           <h2 class="title is-4 heading-emphasis">Most Recent Workout</h2>
 
-          <div v-if="!mostRecentWorkout" class="notification is-info is-light">
+          <div
+            v-if="!mostRecentWorkout"
+            class="notification is-info is-light"
+          >
             You have not published a workout yet. Go to Workouts to create one.
           </div>
 
-          <div v-else class="box">
+          <div
+            v-else
+            class="box"
+          >
             <h3 class="title is-5 mb-2 heading-emphasis">{{ mostRecentWorkout.title }}</h3>
             <p class="data-line">
               <strong>Time Workout:</strong> {{ mostRecentWorkout.workoutTimeMinutes }} minutes |
@@ -189,18 +222,31 @@ function selectAccount(account: (typeof availableAccounts.value)[number]) {
             </p>
           </div>
 
-          <hr class="my-5" />
+          <hr class="my-5">
 
           <h2 class="title is-4 heading-emphasis">Friends Activity</h2>
 
-          <div v-if="activityWorkouts.length === 0" class="notification is-info is-light">
+          <div
+            v-if="activityWorkouts.length === 0"
+            class="notification is-info is-light"
+          >
             No friend activity yet. Once friends publish workouts, it will appear here.
           </div>
 
-          <div v-else class="content">
-            <div v-for="workout in activityWorkouts" :key="workout.id" class="box mb-4 activity-card">
+          <div
+            v-else
+            class="content"
+          >
+            <div
+              v-for="workout in activityWorkouts"
+              :key="workout.id"
+              class="box mb-4 activity-card"
+            >
               <div class="activity-header">
-                <span class="activity-avatar" :class="activityAvatarClass(workout.userId)">
+                <span
+                  class="activity-avatar"
+                  :class="activityAvatarClass(workout.userId)"
+                >
                   {{ userInitialsById(workout.userId) }}
                 </span>
                 <div>

@@ -71,7 +71,11 @@ function handleLogout() {
 </script>
 
 <template>
-  <nav class="navbar site-navbar" role="navigation" aria-label="main navigation">
+  <nav
+    class="navbar site-navbar"
+    role="navigation"
+    aria-label="main navigation"
+  >
     <div class="container navbar-container-full">
       <div class="navbar-brand">
         <button
@@ -82,33 +86,77 @@ function handleLogout() {
           :aria-expanded="showMobileMenu"
           @click="toggleMobileMenu"
         >
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
         </button>
       </div>
 
-      <div class="navbar-menu" :class="{ 'is-active': showMobileMenu }">
+      <div
+        class="navbar-menu"
+        :class="{ 'is-active': showMobileMenu }"
+      >
         <div class="navbar-start">
-          <RouterLink to="/" active-class="is-active" class="navbar-item nav-link" @click="closeMenus">Home</RouterLink>
-          <RouterLink to="/profile" active-class="is-active" class="navbar-item nav-link" @click="closeMenus">Profile</RouterLink>
-          <RouterLink to="/workouts" active-class="is-active" class="navbar-item nav-link" @click="closeMenus">Workouts</RouterLink>
-          <div v-if="isAdmin" class="navbar-item has-dropdown is-hoverable nav-admin-dropdown">
+          <RouterLink
+            to="/"
+            active-class="is-active"
+            class="navbar-item nav-link"
+            @click="closeMenus"
+          >
+            Home
+          </RouterLink>
+          <RouterLink
+            to="/profile"
+            active-class="is-active"
+            class="navbar-item nav-link"
+            @click="closeMenus"
+          >
+            Profile
+          </RouterLink>
+          <RouterLink
+            to="/workouts"
+            active-class="is-active"
+            class="navbar-item nav-link"
+            @click="closeMenus"
+          >
+            Workouts
+          </RouterLink>
+          <div
+            v-if="isAdmin"
+            class="navbar-item has-dropdown is-hoverable nav-admin-dropdown"
+          >
             <span class="navbar-link nav-link nav-admin-link">Admin</span>
             <div class="navbar-dropdown is-right">
-              <RouterLink to="/admin" active-class="is-active" class="navbar-item" @click="closeMenus">
+              <RouterLink
+                to="/admin"
+                active-class="is-active"
+                class="navbar-item"
+                @click="closeMenus"
+              >
                 Dashboard
               </RouterLink>
-              <RouterLink to="/workouts" active-class="is-active" class="navbar-item" @click="closeMenus">
+              <RouterLink
+                to="/workouts"
+                active-class="is-active"
+                class="navbar-item"
+                @click="closeMenus"
+              >
                 Manage Workouts
               </RouterLink>
             </div>
           </div>
-          <span v-else class="navbar-item nav-link is-disabled" aria-disabled="true">Admin</span>
+          <span
+            v-else
+            class="navbar-item nav-link is-disabled"
+            aria-disabled="true"
+          >Admin</span>
         </div>
 
         <div class="navbar-end is-align-items-center">
-          <div v-if="profile" class="navbar-item has-text-white user-chip">
+          <div
+            v-if="profile"
+            class="navbar-item has-text-white user-chip"
+          >
             <img
               v-if="profile.image"
               :src="profile.image"
@@ -116,18 +164,33 @@ function handleLogout() {
               class="user-avatar"
               width="30"
               height="30"
-            />
-            <span v-else class="user-avatar" aria-hidden="true">{{ userInitials }}</span>
+            >
+            <span
+              v-else
+              class="user-avatar"
+              aria-hidden="true"
+            >{{ userInitials }}</span>
             <div class="user-meta">
               <span class="user-name">{{ profile.name }}</span>
               <span class="user-role">{{ profile.email }}</span>
             </div>
-            <button class="button is-danger is-light nav-account-button" @click="handleLogout">Log out</button>
+            <button
+              class="button is-danger is-light nav-account-button"
+              @click="handleLogout"
+            >
+              Log out
+            </button>
           </div>
 
-          <div v-else class="navbar-item">
+          <div
+            v-else
+            class="navbar-item"
+          >
             <div class="buttons">
-              <button class="button is-light nav-account-button" @click="handleLogin">
+              <button
+                class="button is-light nav-account-button"
+                @click="handleLogin"
+              >
                 Log in
               </button>
             </div>

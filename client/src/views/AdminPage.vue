@@ -9,11 +9,17 @@ const { availableAccounts, currentUser, isAdmin } = storeToRefs(authStore)
 <template>
   <section class="section">
     <div class="container">
-      <div v-if="!currentUser" class="notification is-warning is-light">
+      <div
+        v-if="!currentUser"
+        class="notification is-warning is-light"
+      >
         <strong>Log in first:</strong> Use the Log in button in the navbar.
       </div>
 
-      <div v-else-if="!isAdmin" class="notification is-danger is-light">
+      <div
+        v-else-if="!isAdmin"
+        class="notification is-danger is-light"
+      >
         <strong>Access denied:</strong> Admin access is required for this page.
       </div>
 
@@ -31,11 +37,17 @@ const { availableAccounts, currentUser, isAdmin } = storeToRefs(authStore)
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in availableAccounts" :key="user.id">
+              <tr
+                v-for="user in availableAccounts"
+                :key="user.id"
+              >
                 <td>{{ user.id }}</td>
                 <td>{{ user.name }}</td>
                 <td>
-                  <span class="tag" :class="user.role === 'admin' ? 'is-primary' : 'is-info is-light'">
+                  <span
+                    class="tag"
+                    :class="user.role === 'admin' ? 'is-primary' : 'is-info is-light'"
+                  >
                     {{ user.role }}
                   </span>
                 </td>
